@@ -9,4 +9,7 @@ EP1: EP1.c $(HEADERS) $(SOURCES)
 	$(CC) $(CFLAGS) EP1.c $(SOURCES) -o $@
 
 test: test.c $(HEADERS) $(SOURCES)
-	$(CC) $(CFLAGS) test.c $(SOURCES) -o $@ 
+	$(CC) $(CFLAGS) test.c $(SOURCES) -o $@
+
+clean:
+	rm -rf EP1 test *.gch
