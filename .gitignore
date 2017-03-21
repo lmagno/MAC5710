@@ -1,4 +1,4 @@
 *.out
 *.gch
-./EP1/EP1
-./EP1/test
+EP1/EP1
+EP1/test
