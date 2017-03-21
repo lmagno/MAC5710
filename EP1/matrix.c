@@ -17,6 +17,44 @@ Matrix* mcreate(int rows, int cols) {
     return M;
 }
 
+// Load the contents of file 'filename' to the matrix 'M'
+// and return it
+Matrix* mload(char *filename) {
+    int i, j;
+    int rows, cols;
+    Matrix *M;
+    FILE *file = NULL;
+
+    file = fopen(filename, "r");
+
+    fscanf(file, "%d %d", &rows, &cols);
+    M = mcreate(rows, cols);
+
+    for (i = 0; i < rows; i++)
+        for (j = 0; j < cols; j++)
+            fscanf(file, "%d", &(M->M[i][j]));
+
+    fclose(file);
+    return M;
+}
+
+// Load the contents of file 'file' to the matrix 'M'
+// and return it. The file should already be open.
+Matrix* mloadopen(FILE *file) {
+    int i, j;
+    int rows, cols;
+    Matrix *M;
+
+    fscanf(file, "%d %d", &rows, &cols);
+    M = mcreate(rows, cols);
+
+    for (i = 0; i < rows; i++)
+        for (j = 0; j < cols; j++)
+            fscanf(file, "%d", &(M->M[i][j]));
+
+    return M;
+}
+
 // Deallocate the matrix 'M'
 void mfree(Matrix *M) {
     int i;
