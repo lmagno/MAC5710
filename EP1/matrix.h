@@ -2,8 +2,12 @@
 #include <stdlib.h>
 
 typedef struct {
-    double **M;
+    int **M;
     int rows, cols;
 } Matrix;
 
-Matrix matrix(int rows, int cols);
+
+Matrix matrix_create(int rows, int cols);
+void matrix_free(Matrix M);
+void matrix_print(Matrix M);
+void matrix_prettyprint(Matrix M);
