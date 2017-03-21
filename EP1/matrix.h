@@ -7,7 +7,7 @@ typedef struct {
 } Matrix;
 
 
-Matrix matrix_create(int rows, int cols);
-void matrix_free(Matrix M);
-void matrix_print(Matrix M);
-void matrix_prettyprint(Matrix M);
+Matrix* mcreate(int rows, int cols);
+void mfree(Matrix *M);
+void mprint(Matrix *M);
+void mprettyprint(Matrix *M);

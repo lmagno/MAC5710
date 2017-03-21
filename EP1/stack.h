@@ -7,8 +7,8 @@ typedef struct {
     int maxlen;
 } Stack;
 
-Stack* stack_create(int maxlen);
-void stack_push(Stack *s, int i);
-int stack_pop(Stack *s);
-void stack_free(Stack *s);
-void stack_print(Stack *s);
+Stack* screate(int maxlen);
+void   spush(Stack *s, int i);
+int    spop(Stack *s);
+void   sfree(Stack *s);
+void   sprint(Stack *s);

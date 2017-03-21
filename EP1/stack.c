@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "stack.h"
 
-Stack* stack_create(int maxlen) {
+// Allocate a stack of max length 'maxlen'
+Stack* screate(int maxlen) {
     Stack *s;
 
     s = (Stack*)malloc(sizeof(Stack));
@@ -13,7 +14,9 @@ Stack* stack_create(int maxlen) {
     return s;
 }
 
-void stack_push(Stack *s, int i) {
+// Push value 'i' into the top of the stack 's',
+// checking and exiting with failure if it's full
+void spush(Stack *s, int i) {
     if (s->top == s->maxlen) {
         fprintf(stderr, "The stack is full! Cannot push into index %d.\n", s->maxlen);
         exit(EXIT_FAILURE);
@@ -21,7 +24,9 @@ void stack_push(Stack *s, int i) {
     s->s[s->top++] = i;
 }
 
-int stack_pop(Stack *s) {
+// Pop and return a value from the stack 's',
+// checking and exiting with failure if it's empty
+int spop(Stack *s) {
     if (s->top == 0) {
         fprintf(stderr, "The stack is empty! Cannot pop.\n");
         exit(EXIT_FAILURE);
@@ -30,7 +35,8 @@ int stack_pop(Stack *s) {
     return s->s[--s->top];
 }
 
-void stack_print(Stack *s) {
+// Print a representation of the stack 's' to STDOUT
+void sprint(Stack *s) {
     int i;
 
     printf("\n");
@@ -40,7 +46,8 @@ void stack_print(Stack *s) {
     printf("\n");
 }
 
-void stack_free(Stack *s) {
+// Deallocate stack 's'
+void sfree(Stack *s) {
     free(s->s);
     free(s);
 }

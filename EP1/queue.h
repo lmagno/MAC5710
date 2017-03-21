@@ -8,8 +8,8 @@ typedef struct {
     int maxlen;
 } Queue;
 
-Queue* queue_create(int maxlen);
-void   queue_push(Queue *q, int i);
-int    queue_pop(Queue *q);
-void   queue_free(Queue *q);
-void   queue_print(Queue *q);
+Queue* qcreate(int maxlen);
+void   qpush(Queue *q, int i);
+int    qpop(Queue *q);
+void   qfree(Queue *q);
+void   qprint(Queue *q);
