@@ -64,6 +64,28 @@ void mfree(Matrix *M) {
     free(M->M);
 }
 
+// Get the value of the element at index (i, j) of matrix 'M',
+// exiting with failure if the index is out of bounds
+int mget(Matrix *M, int i, int j) {
+    if (i >= M->rows || j >= M->cols) {
+        fprintf(stderr, "ERROR: Out-of-bounds error, matrix has size (%d, %d), cannot get index (%d, %d).\n", M->rows, M->cols, i, j);
+        exit(EXIT_FAILURE);
+    }
+
+    return M->M[i][j];
+}
+
+// Set the value 'c' to the element at index (i, j) of matrix 'M',
+// exiting with failure if the index is out of bounds
+void mset(Matrix *M, int i, int j, int c) {
+    if (i >= M->rows || j >= M->cols) {
+        fprintf(stderr, "ERROR: Out-of-bounds error, matrix has size (%d, %d), cannot set index (%d, %d).\n", M->rows, M->cols, i, j);
+        exit(EXIT_FAILURE);
+    }
+
+    M->M[i][j] = c;
+}
+
 // Print a representation of the matrix 'M' to STDOUT
 void mprint(Matrix *M) {
     int i, j;

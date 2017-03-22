@@ -8,14 +8,15 @@ int main() {
     Stack *s;
     Queue *q;
     FILE *file = NULL;
-    
+
     printf("=================Matrix=================\n\n");
     M = mcreate(10, 11);
-    M->M[5][5] = -1;
-    M->M[1][5] = -1;
-    M->M[3][9] = -1;
-    M->M[2][7] = -1;
-    M->M[3][6] = -1;
+    mset(M, 5, 5, -1);
+    mset(M, 1, 1, -1);
+    mset(M, 3, 3, -1);
+    mset(M, 2, 2, -1);
+    mset(M, 3, 3, -1);
+
 
     mprint(M);
     mprettyprint(M);
