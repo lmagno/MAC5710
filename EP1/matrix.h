@@ -8,7 +8,7 @@ typedef struct {
 
 
 Matrix* mcreate(int rows, int cols);
-Matrix* mload(char *filename);
+Matrix* mload(char const *filename);
 Matrix* mloadopen(FILE *file);
 int mget(Matrix *M, int i, int j);
 void mset(Matrix *M, int i, int j, int c);

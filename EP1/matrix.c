@@ -19,7 +19,7 @@ Matrix* mcreate(int rows, int cols) {
 
 // Load the contents of file 'filename' to the matrix 'M'
 // and return it
-Matrix* mload(char *filename) {
+Matrix* mload(char const *filename) {
     int i, j;
     int rows, cols;
     Matrix *M;
