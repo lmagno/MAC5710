@@ -69,10 +69,23 @@ int spop(Stack *s) {
 // Print a representation of the stack 's' to STDOUT
 void sprint(Stack *s) {
     SCell *c;
+    Stack *inv; // stack for inverting the order of the elements
 
+    if (slength(s) == 0) {
+        printf("[]\n");
+        return;
+    }
+
+    inv = screate();
+    for (c = s->top; c != NULL; c = c->next) spush(inv, c->value);
+
+    printf("[");
+    printf("%d", spop(inv));
+    while (slength(inv) > 0) printf(", %d", spop(inv));
+    printf("]");
     printf("\n");
-    for (c = s->top; c != NULL; c = c->next) printf("%4d", c->value);
-    printf("\n");
+
+    sfree(inv);
 }
 
 // Deallocate stack 's'

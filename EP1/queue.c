@@ -78,13 +78,18 @@ int qpop(Queue *q) {
 
 // Print a representation of the queue 'q' to STDOUT
 void qprint(Queue *q) {
-    int i;
     QCell *c;
 
-    printf("\n");
-    for (i = 1; i <= qlength(q); i++) printf("%4d", i);
-    printf("\n");
-    for (c = q->first; c != NULL; c = c->next) printf("%4d", c->value);
+    if (qlength(q) == 0) {
+        printf("[]\n");
+        return;
+    }
+
+    c = q->first;
+    printf("[");
+    printf("%d", c->value);
+    for (c = c->next; c != NULL; c = c->next) printf(", %d", c->value);
+    printf("]");
     printf("\n");
 }
 

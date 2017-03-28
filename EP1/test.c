@@ -45,23 +45,17 @@ int main() {
     spop(s); sprint(s);
     spop(s); sprint(s);
     spop(s); sprint(s);
-    spop(s); sprint(s);
     sfree(s);
 
 
     printf("=================Queue=================\n\n");
-    q = qcreate();
-    qpush(q, 1);
-    qpush(q, 2);
-    qpush(q, 3);
-    qprint(q);
-    qpop(q);
-    qprint(q);
-    qpop(q);
-    qprint(q);
-    qpop(q);
-    qprint(q);
-    printf("length = %d\n", qlength(q));
+    q = qcreate(); qprint(q);
+    qpush(q, 1); qprint(q);
+    qpush(q, 2); qprint(q);
+    qpush(q, 3); qprint(q);
+    qpop(q); qprint(q);
+    qpop(q); qprint(q);
+    qpop(q); qprint(q);
     qfree(q);
     return 0;
 }
