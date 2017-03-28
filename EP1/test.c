@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "matrix.h"
-#include "stack.h"
-#include "queue.h"
+#include "libs/matrix.h"
+#include "libs/stack.h"
+#include "libs/queue.h"
 
 int main() {
     Matrix *M;
@@ -22,13 +22,18 @@ int main() {
     mprettyprint(M);
     mfree(M);
 
-    M = mload("input.dat");
+    M = mloadname("data/input.dat");
     mprint(M);
     mprettyprint(M);
     mfree(M);
 
-    file = fopen("input.dat", "r");
-    M = mloadopen(file);
+    file = fopen("data/input.dat", "r");
+    if (file == NULL) {
+        fprintf(stderr, "Could not open file '%s'.", "data/input.dat");
+        exit(EXIT_FAILURE);
+    }
+
+    M = mloadfile(file);
     fclose(file);
     mprint(M);
     mprettyprint(M);

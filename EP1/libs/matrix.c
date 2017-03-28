@@ -19,13 +19,17 @@ Matrix* mcreate(int rows, int cols) {
 
 // Load the contents of file 'filename' to the matrix 'M'
 // and return it
-Matrix* mload(char const *filename) {
+Matrix* mloadname(char const *filename) {
     int i, j;
     int rows, cols;
     Matrix *M;
     FILE *file = NULL;
 
     file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "ERROR: Could not open file '%s'.\n", filename);
+        exit(EXIT_FAILURE);
+    }
 
     fscanf(file, "%d %d", &rows, &cols);
     M = mcreate(rows, cols);
@@ -40,7 +44,7 @@ Matrix* mload(char const *filename) {
 
 // Load the contents of file 'file' to the matrix 'M'
 // and return it. The file should already be open.
-Matrix* mloadopen(FILE *file) {
+Matrix* mloadfile(FILE *file) {
     int i, j;
     int rows, cols;
     Matrix *M;

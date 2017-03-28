@@ -1,9 +1,10 @@
 CC = gcc
 CFLAGS = -g -Wall
 
-LIBS = matrix stack queue
-HEADERS = $(addsuffix .h, $(LIBS))
-SOURCES = $(addsuffix .c, $(LIBS))
+LIBNAMES = input matrix stack queue
+LIBFILES = $(addprefix libs/, $(LIBNAMES))
+HEADERS = $(addsuffix .h, $(LIBFILES))
+SOURCES = $(addsuffix .c, $(LIBFILES))
 
 EP1: EP1.c $(HEADERS) $(SOURCES)
 	$(CC) $(CFLAGS) EP1.c $(SOURCES) -o $@
