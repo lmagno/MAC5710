@@ -35,17 +35,17 @@ int main() {
     mfree(M);
 
     printf("=================Stack=================\n\n");
-    s = screate(100);
+    s = screate();
     sprint(s);
-    spush(s, 1);
-    spush(s, 2);
-    spush(s, 3);
-    spush(s, -1);
-    sprint(s);
-    spop(s);
-    spop(s);
-    spop(s);
-    sprint(s);
+    spush(s, 1); sprint(s);
+    spush(s, 2); sprint(s);
+    spush(s, 3); sprint(s);
+    spush(s, -1); sprint(s);
+    spop(s); sprint(s);
+    spop(s); sprint(s);
+    spop(s); sprint(s);
+    spop(s); sprint(s);
+    spop(s); sprint(s);
     sfree(s);
 
 

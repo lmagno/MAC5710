@@ -2,52 +2,94 @@
 #include <stdlib.h>
 #include "stack.h"
 
-// Allocate a stack of max length 'maxlen'
-Stack* screate(int maxlen) {
+// A single cell of the stack
+struct _SCell {
+    int value;
+    struct _SCell *next;
+};
+
+
+// The header of the queue
+struct _Stack {
+    int length;
+    SCell *top;
+};
+
+// Allocate an empty stack
+Stack* screate() {
     Stack *s;
 
     s = (Stack*)malloc(sizeof(Stack));
-    s->maxlen = maxlen;
-    s->top = 0;
-    s->s = (int*)malloc(maxlen*sizeof(int));
+    s->length = 0;
+    s->top = NULL;
 
     return s;
 }
 
-// Push value 'i' into the top of the stack 's',
-// checking and exiting with failure if it's full
+// Push value 'i' into the top of the stack 's'
 void spush(Stack *s, int i) {
-    if (s->top == s->maxlen) {
-        fprintf(stderr, "The stack is full! Cannot push into index %d.\n", s->maxlen);
-        exit(EXIT_FAILURE);
-    }
-    s->s[s->top++] = i;
+    SCell *c;
+
+    // Initialize a SCell with the value 'i'
+    c = (SCell*)malloc(sizeof(SCell));
+    c->value = i;
+
+    // Add it to the top of the stack
+    c->next = s->top;
+    s->top = c;
+
+    s->length += 1;
 }
 
 // Pop and return a value from the stack 's',
 // checking and exiting with failure if it's empty
 int spop(Stack *s) {
-    if (s->top == 0) {
+    SCell *c;
+    int v;
+
+    if (slength(s) == 0) {
         fprintf(stderr, "The stack is empty! Cannot pop.\n");
         exit(EXIT_FAILURE);
     }
 
-    return s->s[--s->top];
+    // Pop the top cell
+    c = s->top;
+
+    // Extract its value
+    v = c->value;
+
+    // Set the second cell as the top
+    s->top = c->next;
+    s->length -= 1;
+
+    free(c);
+    return v;
 }
 
 // Print a representation of the stack 's' to STDOUT
 void sprint(Stack *s) {
-    int i;
+    SCell *c;
 
     printf("\n");
-    for (i = 0; i < s->top; i++) printf("%4d", i);
-    printf("\n");
-    for (i = 0; i < s->top; i++) printf("%4d", s->s[i]);
+    for (c = s->top; c != NULL; c = c->next) printf("%4d", c->value);
     printf("\n");
 }
 
 // Deallocate stack 's'
 void sfree(Stack *s) {
-    free(s->s);
+    SCell *a, *b;
+
+    a = s->top;
+    while (a != NULL) {
+        b = a->next;
+        free(a);
+        a = b;
+    }
+
     free(s);
+}
+
+// Get the length of the stack 's'
+int slength(Stack *s) {
+    return s->length;
 }
