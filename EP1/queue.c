@@ -17,7 +17,7 @@ struct _Queue {
 };
 
 
-// Allocate a queue 'q' with max length 'maxlen'
+// Allocate an empty queue
 Queue* qcreate() {
     Queue *q;
 
