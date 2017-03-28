@@ -2,12 +2,13 @@
 #include "libs/matrix.h"
 #include "libs/stack.h"
 #include "libs/queue.h"
+#include "libs/input.h"
 
 int main() {
     Matrix *M;
     Stack *s;
     Queue *q;
-    FILE *file = NULL;
+    Input *I;
 
     printf("=================Matrix=================\n\n");
     M = mcreate(10, 11);
@@ -22,22 +23,13 @@ int main() {
     mprettyprint(M);
     mfree(M);
 
-    M = mloadname("data/input.dat");
-    mprint(M);
-    mprettyprint(M);
-    mfree(M);
-
-    file = fopen("data/input.dat", "r");
-    if (file == NULL) {
-        fprintf(stderr, "Could not open file '%s'.", "data/input.dat");
-        exit(EXIT_FAILURE);
-    }
-
-    M = mloadfile(file);
-    fclose(file);
-    mprint(M);
-    mprettyprint(M);
-    mfree(M);
+    printf("\n");
+    I = fileload("data/input.dat");
+    printf("t = (%d, %d)\n", I->ti, I->tj);
+    printf("s = (%d, %d)\n", I->si, I->sj);
+    mprint(I->M);
+    mprettyprint(I->M);
+    mfree(I->M);
 
     printf("=================Stack=================\n\n");
     s = screate();

@@ -13,4 +13,4 @@ test: test.c $(HEADERS) $(SOURCES)
 	$(CC) $(CFLAGS) test.c $(SOURCES) -o $@
 
 clean:
-	rm -rf EP1 test *.gch
+	rm -rf EP1 test libs/*.gch

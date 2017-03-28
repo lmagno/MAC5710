@@ -1,3 +1,6 @@
+#ifndef QUEUE_H
+#define QUEUE_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,3 +13,5 @@ int    qpop(Queue *q);
 void   qfree(Queue *q);
 void   qprint(Queue *q);
 int    qlength(Queue* q);
+
+#endif
