@@ -2,53 +2,109 @@
 #include <stdlib.h>
 #include "queue.h"
 
+// A single cell of the queue
+struct _QCell {
+    int value;
+    struct _QCell *next;
+};
+
+
+// The header of the queue
+struct _Queue {
+    int length;
+    QCell *first;
+    QCell *last;
+};
+
+
 // Allocate a queue 'q' with max length 'maxlen'
-Queue* qcreate(int maxlen) {
+Queue* qcreate() {
     Queue *q;
 
     q = (Queue*)malloc(sizeof(Queue));
-    q->maxlen = maxlen;
-    q->bottom = 0;
-    q->top = 0;
-    q->q = (int*)malloc(maxlen*sizeof(int));
+
+    q->length = 0;
+    q->first = NULL;
+    q->last  = NULL;
 
     return q;
 }
 
-// Push a value 'i' into the queue 'q',
-// checking and exiting with error if it's full
+// Push a value 'i' into the queue 'q'
 void qpush(Queue *q, int i) {
-    if (q->top == q->maxlen) {
-        fprintf(stderr, "The queue is full! Cannot push into index %d.\n", q->maxlen);
-        exit(EXIT_FAILURE);
+    QCell *c;
+
+    // Initalize a QCell with the value 'i'
+    c = (QCell*)malloc(sizeof(QCell));
+    c->value = i;
+    c->next = NULL;
+
+    // Add it to the end of the queue
+    if (qlength(q) == 0) {
+        q->first = c;
+        q->last  = c;
+    } else {
+        q->last->next = c;
+        q->last = c;
     }
-    q->q[q->top++] = i;
+
+    q->length += 1;
 }
 
 // Pop and return a value from the queue 'q',
 // checking and exiting with failure if it's empty
 int qpop(Queue *q) {
-    if (q->bottom == q->top) {
+    int v;
+    QCell *c;
+    if (qlength(q) == 0) {
         fprintf(stderr, "The queue is empty! Cannot pop.\n");
         exit(EXIT_FAILURE);
     }
 
-    return q->q[q->bottom++];
+    // Pop first cell
+    c = q->first;
+
+    // Extract its value
+    v = c->value;
+
+    // Set the second cell as the new first
+    q->first = c->next;
+    q->length -= 1;
+
+    free(c);
+    return v;
 }
 
 // Print a representation of the queue 'q' to STDOUT
 void qprint(Queue *q) {
     int i;
+    QCell *c;
 
     printf("\n");
-    for (i = q->bottom; i < q->top; i++) printf("%4d", i);
+    for (i = 1; i <= qlength(q); i++) printf("%4d", i);
     printf("\n");
-    for (i = q->bottom; i < q->top; i++) printf("%4d", q->q[i]);
+    for (c = q->first; c != NULL; c = c->next) printf("%4d", c->value);
     printf("\n");
 }
 
 // Deallocate the queue 'q'
 void qfree(Queue *q) {
-    free(q->q);
+    QCell *a, *b;
+
+    if (qlength(q) > 0) {
+        a = q->first;
+        b = a->next;
+        while (b != NULL) {
+            free(a);
+            a = b;
+            b = b->next;
+        }
+    }
+
     free(q);
+}
+
+// Get the length of the queue 'q'
+int qlength(Queue *q) {
+    return q->length;
 }
