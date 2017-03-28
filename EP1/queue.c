@@ -56,6 +56,7 @@ void qpush(Queue *q, int i) {
 int qpop(Queue *q) {
     int v;
     QCell *c;
+
     if (qlength(q) == 0) {
         fprintf(stderr, "The queue is empty! Cannot pop.\n");
         exit(EXIT_FAILURE);
@@ -91,14 +92,11 @@ void qprint(Queue *q) {
 void qfree(Queue *q) {
     QCell *a, *b;
 
-    if (qlength(q) > 0) {
-        a = q->first;
+    a = q->first;
+    while (a != NULL) {
         b = a->next;
-        while (b != NULL) {
-            free(a);
-            a = b;
-            b = b->next;
-        }
+        free(a);
+        a = b;
     }
 
     free(q);
