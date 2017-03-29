@@ -70,8 +70,13 @@ void graph_print(Graph *g) {
         printf("%3d", i);
         for(j = 0; j < g->cols; j++) {
             n = g->nodes[i][j];
+
             if(!n)
                 printf("███");
+            else if(i == g->ti && j == g->tj)
+                printf(" t ");
+            else if(i == g->si && j == g->sj)
+                printf(" s ");
             else if (n->shortest)
                 printf(" * ");
             else
@@ -128,6 +133,11 @@ Graph* graph_load(const char *filename) {
     }
 
     fclose(file);
+
+    if(ti == si && tj == sj) {
+        fprintf(stderr, "ERROR: Start and end index are the same: (%d, %d).\n", ti, tj);
+        exit(EXIT_FAILURE);
+    }
 
     if(!g->nodes[ti][tj]) {
         fprintf(stderr, "ERROR: Start index (%d, %d) is a wall.\n", ti, tj);

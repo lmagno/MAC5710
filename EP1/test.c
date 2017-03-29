@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "libs/stack.h"
 #include "libs/queue.h"
-#include "libs/input.h"
 #include "libs/graph.h"
 
 int main() {
