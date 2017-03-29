@@ -11,8 +11,6 @@ int main() {
     printf("=================Graph=================\n\n");
     printf("\n");
     g = graph_load("data/input.dat");
-    printf("t = (%d, %d)\n", g->ti, g->tj);
-    printf("s = (%d, %d)\n", g->si, g->sj);
 
     graph_print(g);
     graph_free(g);

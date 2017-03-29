@@ -86,6 +86,34 @@ void graph_print(Graph *g) {
     }
 }
 
+void graph_print_dist(Graph *g) {
+    int i, j;
+    Node *n;
+
+    printf("   ");
+    for(j = 0; j < g->cols; j++) printf("%3d", j);
+    printf("\n");
+
+    for(i = 0; i < g->rows; i++) {
+        printf("%3d", i);
+        for(j = 0; j < g->cols; j++) {
+            n = g->nodes[i][j];
+
+            if(!n)
+                printf("███");
+            else if(i == g->ti && j == g->tj)
+                printf(" t ");
+            else if(i == g->si && j == g->sj)
+                printf(" s ");
+            else if (n->dist < INT_MAX)
+                printf("%3d", n->dist);
+            else
+                printf("   ");
+        }
+        printf("\n");
+    }
+}
+
 // Load graph data from file 'filename'
 Graph* graph_load(const char *filename) {
     int i, j, v;
