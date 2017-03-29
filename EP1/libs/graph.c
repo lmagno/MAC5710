@@ -67,7 +67,13 @@ Node** node_neighbors(Graph *g, Node *n, int *nlen) {
 
 void graph_print(Graph *g) {
     int i, j;
+    // int dx, dy;
     Node *n;
+    Node *nleft, *nright, *nup, *ndown;
+    bool left, right, up, down;
+
+    // dx = g->ti - g->si;
+    // dy = g->tj - g->sj;
 
     printf("   ");
     for(j = 0; j < g->cols; j++) printf("%3d", j);
@@ -84,10 +90,45 @@ void graph_print(Graph *g) {
                 printf(" t ");
             else if(i == g->si && j == g->sj)
                 printf(" s ");
-            else if (n->shortest)
-                printf(" * ");
-            else
+            else if (!n->shortest)
                 printf("   ");
+            else {
+                nleft = nright = nup = ndown = NULL;
+                left  =  right =  up =  down = false;
+
+                // Get the neighboring nodes
+                if(j-1 >= 0)       nleft = g->nodes[i][j-1];
+                if(i-1 >= 0)         nup = g->nodes[i-1][j];
+                if(j+1 < g->cols) nright = g->nodes[i][j+1];
+                if(i+1 < g->rows)  ndown = g->nodes[i+1][j];
+
+                // Get which will lead along a shortest path to the end point
+                if(nleft  &&  nleft->shortest && ( nleft->dist > n->dist))  left = true;
+                if(nright && nright->shortest && (nright->dist > n->dist)) right = true;
+                if(nup    &&    nup->shortest && (   nup->dist > n->dist))    up = true;
+                if(ndown  &&  ndown->shortest && ( ndown->dist > n->dist))  down = true;
+
+                
+                // Print accordingly
+                if(left)
+                    printf("←");
+                else
+                    printf(" ");
+
+                if(up && down)
+                    printf("↕");
+                else if (up)
+                    printf("↑");
+                else if (down)
+                    printf("↓");
+                else
+                    printf(" ");
+
+                if(right)
+                    printf("→");
+                else
+                    printf(" ");
+            }
         }
         printf("\n");
     }
