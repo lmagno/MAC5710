@@ -3,13 +3,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrix.h"
+#include "graph.h"
 
 // Struct to keep input data organized
 typedef struct {
     int ti, tj;
     int si, sj;
-    Matrix *M;
+    Graph *g;
 } Input;
 
 Input* fileload(const char *filename);

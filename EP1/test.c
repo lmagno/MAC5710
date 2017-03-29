@@ -1,35 +1,24 @@
 #include <stdio.h>
-#include "libs/matrix.h"
 #include "libs/stack.h"
 #include "libs/queue.h"
 #include "libs/input.h"
+#include "libs/graph.h"
 
 int main() {
-    Matrix *M;
     Stack *s;
     Queue *q;
     Input *I;
+    Graph *g;
 
-    printf("=================Matrix=================\n\n");
-    M = mcreate(10, 11);
-    mset(M, 5, 5, -1);
-    mset(M, 1, 1, -1);
-    mset(M, 3, 3, -1);
-    mset(M, 2, 2, -1);
-    mset(M, 3, 3, -1);
-
-
-    mprint(M);
-    mprettyprint(M);
-    mfree(M);
-
+    printf("=================Graph=================\n\n");
     printf("\n");
     I = fileload("data/input.dat");
     printf("t = (%d, %d)\n", I->ti, I->tj);
     printf("s = (%d, %d)\n", I->si, I->sj);
-    mprint(I->M);
-    mprettyprint(I->M);
-    mfree(I->M);
+
+    g = I->g;
+    graph_print(g);
+    graph_free(g);
 
     printf("=================Stack=================\n\n");
     s = screate();

@@ -10,7 +10,7 @@ Input* fileload(const char *filename) {
     Input *I;
 
     file = fopen(filename, "r");
-    if (file == NULL) {
+    if (!file) {
         fprintf(stderr, "ERROR: Could not open file '%s'.\n", filename);
         exit(EXIT_FAILURE);
     }
@@ -21,12 +21,13 @@ Input* fileload(const char *filename) {
     fscanf(file, "%d %d", &(I->si), &(I->sj));
     fscanf(file, "%d %d", &rows, &cols);
 
-    I->M = mcreate(rows, cols);
+    I->g = graph_create(rows, cols);
 
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
             fscanf(file, "%d", &v);
-            mset(I->M, i, j, v);
+            if(v == 0)
+                I->g->nodes[i][j] = node_create();
         }
     }
 
