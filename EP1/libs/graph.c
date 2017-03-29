@@ -80,3 +80,69 @@ void graph_print(Graph *g) {
         printf("\n");
     }
 }
+
+// Load graph data from file 'filename'
+Graph* graph_load(const char *filename) {
+    int i, j, v;
+    int ti, tj;
+    int si, sj;
+    int rows, cols;
+    Graph *g;
+    FILE *file = NULL;
+
+    file = fopen(filename, "r");
+    if (!file) {
+        fprintf(stderr, "ERROR: Could not open file '%s'.\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    fscanf(file, "%d %d", &ti, &tj);
+    fscanf(file, "%d %d", &si, &sj);
+    fscanf(file, "%d %d", &rows, &cols);
+
+    if (ti < 0 || tj < 0 || ti >= rows || tj >= cols) {
+        fprintf(stderr, "ERROR: Start index out-of-bounds.\n");
+        fprintf(stderr, "\tIndex = (%d, %d).\n", ti, tj);
+        fprintf(stderr, "\tGraph dimensions = (%d, %d).\n", rows, cols);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    if (si < 0 || sj < 0 || si >= rows || sj >= cols) {
+        fprintf(stderr, "ERROR: End index out-of-bounds.\n");
+        fprintf(stderr, "\tIndex = (%d, %d).\n", si, sj);
+        fprintf(stderr, "\tGraph dimensions = (%d, %d).\n", rows, cols);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+
+    g = graph_create(rows, cols);
+
+    for (i = 0; i < rows; i++) {
+        for (j = 0; j < cols; j++) {
+            fscanf(file, "%d", &v);
+            if(v == 0)
+                g->nodes[i][j] = node_create();
+        }
+    }
+
+    fclose(file);
+
+    if(!g->nodes[ti][tj]) {
+        fprintf(stderr, "ERROR: Start index (%d, %d) is a wall.\n", ti, tj);
+        exit(EXIT_FAILURE);
+    }
+
+    if(!g->nodes[si][sj]) {
+        fprintf(stderr, "ERROR: End index (%d, %d) is a wall.\n", si, sj);
+        exit(EXIT_FAILURE);
+    }
+
+    g->ti = ti;
+    g->tj = tj;
+    g->si = si;
+    g->sj = sj;
+
+    return g;
+}

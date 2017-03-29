@@ -7,16 +7,14 @@
 int main() {
     Stack *s;
     Queue *q;
-    Input *I;
     Graph *g;
 
     printf("=================Graph=================\n\n");
     printf("\n");
-    I = fileload("data/input.dat");
-    printf("t = (%d, %d)\n", I->ti, I->tj);
-    printf("s = (%d, %d)\n", I->si, I->sj);
+    g = graph_load("data/input.dat");
+    printf("t = (%d, %d)\n", g->ti, g->tj);
+    printf("s = (%d, %d)\n", g->si, g->sj);
 
-    g = I->g;
     graph_print(g);
     graph_free(g);
 
