@@ -1,12 +1,15 @@
 #include "graph.h"
 
-Node* node_create() {
+Node* node_create(int i, int j) {
     Node *n;
 
     n = (Node*)malloc(sizeof(Node));
 
+    n->i = i;
+    n->j = j;
     n->dist = INT_MAX;
     n->shortest = false;
+    n->marked = false;
 
     return n;
 }
@@ -39,7 +42,10 @@ void graph_free(Graph *g) {
     free(g);
 }
 
-Node** node_neighbors(Graph *g, int i, int j, int *nlen) {
+Node** node_neighbors(Graph *g, Node *n, int *nlen) {
+    int i = n->i;
+    int j = n->j;
+    int k;
     Node **neighbors;
 
     if(i < 0 || j < 0 || i >= g->rows || i >= g->cols) {
@@ -49,12 +55,13 @@ Node** node_neighbors(Graph *g, int i, int j, int *nlen) {
 
     neighbors = (Node**)calloc(4, sizeof(Node*));
 
-    *nlen = 0;
-    if(i-1 >= 0       && g->nodes[i-1][j]) neighbors[*nlen++] = g->nodes[i-1][j];
-    if(j-1 >= 0       && g->nodes[i][j-1]) neighbors[*nlen++] = g->nodes[i][j-1];
-    if(i+1 <  g->rows && g->nodes[i+1][j]) neighbors[*nlen++] = g->nodes[i+1][j];
-    if(j+1 <  g->cols && g->nodes[i][j+1]) neighbors[*nlen++] = g->nodes[i][j+1];
+    k = 0;
+    if(i-1 >= 0       && g->nodes[i-1][j]) neighbors[k++] = g->nodes[i-1][j];
+    if(j-1 >= 0       && g->nodes[i][j-1]) neighbors[k++] = g->nodes[i][j-1];
+    if(i+1 <  g->rows && g->nodes[i+1][j]) neighbors[k++] = g->nodes[i+1][j];
+    if(j+1 <  g->cols && g->nodes[i][j+1]) neighbors[k++] = g->nodes[i][j+1];
 
+    *nlen = k;
     return neighbors;
 }
 
@@ -105,10 +112,10 @@ void graph_print_dist(Graph *g) {
                 printf(" t ");
             else if(i == g->si && j == g->sj)
                 printf(" s ");
-            else if (n->dist < INT_MAX)
-                printf("%3d", n->dist);
+            else if (n->dist == INT_MAX)
+                printf("%3d", -1);
             else
-                printf("   ");
+                printf("%3d", n->dist);
         }
         printf("\n");
     }
@@ -156,7 +163,7 @@ Graph* graph_load(const char *filename) {
         for (j = 0; j < cols; j++) {
             fscanf(file, "%d", &v);
             if(v == 0)
-                g->nodes[i][j] = node_create();
+                g->nodes[i][j] = node_create(i, j);
         }
     }
 

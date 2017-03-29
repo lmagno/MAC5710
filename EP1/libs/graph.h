@@ -10,8 +10,9 @@
 // #define FALSE 0
 
 typedef struct _Node {
+    int i, j;
     int dist;
-    bool shortest;
+    bool marked, shortest;
 } Node;
 
 typedef struct _Graph {
@@ -22,7 +23,7 @@ typedef struct _Graph {
 } Graph;
 
 Node*  node_create();
-Node** node_neighbors(Graph *g, int i, int j, int *nlen);
+Node** node_neighbors(Graph *g, Node *n, int *nlen);
 Graph* graph_create(int rows, int cols);
 void   graph_free(Graph *g);
 void   graph_print(Graph *g);

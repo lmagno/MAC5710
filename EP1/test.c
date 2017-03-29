@@ -12,7 +12,7 @@ int main() {
     printf("\n");
     g = graph_load("data/input.dat");
 
-    graph_print(g);
+    graph_print_dist(g);
     graph_free(g);
 
     printf("=================Stack=================\n\n");
