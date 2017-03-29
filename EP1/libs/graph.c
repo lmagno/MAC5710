@@ -191,3 +191,17 @@ Graph* graph_load(const char *filename) {
 
     return g;
 }
+
+// Unmark all nodes of the graph 'g'
+void graph_unmark_nodes(Graph *g) {
+    int i, j;
+    Node *n;
+
+    for(i = 0; i < g->rows; i++) {
+        for(j = 0; j < g->cols; j++) {
+            n = g->nodes[i][j];
+            if(n)
+                n->marked = false;
+        }
+    }
+}

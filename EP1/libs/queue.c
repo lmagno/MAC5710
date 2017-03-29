@@ -18,7 +18,7 @@ struct _Queue {
 
 
 // Allocate an empty queue
-Queue* qcreate() {
+Queue* queue_create() {
     Queue *q;
 
     q = (Queue*)malloc(sizeof(Queue));
@@ -31,7 +31,7 @@ Queue* qcreate() {
 }
 
 // Push a value 'i' into the queue 'q'
-void qpush(Queue *q, int i) {
+void queue_push(Queue *q, int i) {
     QCell *c;
 
     // Initalize a QCell with the value 'i'
@@ -40,7 +40,7 @@ void qpush(Queue *q, int i) {
     c->next = NULL;
 
     // Add it to the end of the queue
-    if (qlength(q) == 0) {
+    if (queue_length(q) == 0) {
         q->first = c;
         q->last  = c;
     } else {
@@ -53,11 +53,11 @@ void qpush(Queue *q, int i) {
 
 // Pop and return a value from the queue 'q',
 // checking and exiting with failure if it's empty
-int qpop(Queue *q) {
+int queue_pop(Queue *q) {
     int v;
     QCell *c;
 
-    if (qlength(q) == 0) {
+    if (queue_length(q) == 0) {
         fprintf(stderr, "The queue is empty! Cannot pop.\n");
         exit(EXIT_FAILURE);
     }
@@ -77,10 +77,10 @@ int qpop(Queue *q) {
 }
 
 // Print a representation of the queue 'q' to STDOUT
-void qprint(Queue *q) {
+void queue_print(Queue *q) {
     QCell *c;
 
-    if (qlength(q) == 0) {
+    if (queue_length(q) == 0) {
         printf("[]\n");
         return;
     }
@@ -94,7 +94,7 @@ void qprint(Queue *q) {
 }
 
 // Deallocate the queue 'q'
-void qfree(Queue *q) {
+void queue_free(Queue *q) {
     QCell *a, *b;
 
     a = q->first;
@@ -108,6 +108,6 @@ void qfree(Queue *q) {
 }
 
 // Get the length of the queue 'q'
-int qlength(Queue *q) {
+int queue_length(Queue *q) {
     return q->length;
 }

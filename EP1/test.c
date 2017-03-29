@@ -16,27 +16,27 @@ int main() {
     graph_free(g);
 
     printf("=================Stack=================\n\n");
-    s = screate();
-    sprint(s);
-    spush(s, 1); sprint(s);
-    spush(s, 2); sprint(s);
-    spush(s, 3); sprint(s);
-    spush(s, -1); sprint(s);
-    spop(s); sprint(s);
-    spop(s); sprint(s);
-    spop(s); sprint(s);
-    spop(s); sprint(s);
-    sfree(s);
+    s = stack_create();
+    stack_print(s);
+    stack_push(s, 1); stack_print(s);
+    stack_push(s, 2); stack_print(s);
+    stack_push(s, 3); stack_print(s);
+    stack_push(s, -1); stack_print(s);
+    stack_pop(s); stack_print(s);
+    stack_pop(s); stack_print(s);
+    stack_pop(s); stack_print(s);
+    stack_pop(s); stack_print(s);
+    stack_free(s);
 
 
     printf("=================Queue=================\n\n");
-    q = qcreate(); qprint(q);
-    qpush(q, 1); qprint(q);
-    qpush(q, 2); qprint(q);
-    qpush(q, 3); qprint(q);
-    qpop(q); qprint(q);
-    qpop(q); qprint(q);
-    qpop(q); qprint(q);
-    qfree(q);
+    q = queue_create(); queue_print(q);
+    queue_push(q, 1); queue_print(q);
+    queue_push(q, 2); queue_print(q);
+    queue_push(q, 3); queue_print(q);
+    queue_pop(q); queue_print(q);
+    queue_pop(q); queue_print(q);
+    queue_pop(q); queue_print(q);
+    queue_free(q);
     return 0;
 }

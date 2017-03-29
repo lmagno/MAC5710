@@ -7,11 +7,11 @@
 typedef struct _SCell SCell;
 typedef struct _Stack Stack;
 
-Stack* screate();
-void   spush(Stack *s, int i);
-int    spop(Stack *s);
-void   sfree(Stack *s);
-void   sprint(Stack *s);
-int    slength(Stack *s);
+Stack* stack_create();
+void   stack_push(Stack *s, int i);
+int    stack_pop(Stack *s);
+void   stack_free(Stack *s);
+void   stack_print(Stack *s);
+int    stack_length(Stack *s);
 
 #endif

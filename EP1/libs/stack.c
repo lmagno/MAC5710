@@ -16,7 +16,7 @@ struct _Stack {
 };
 
 // Allocate an empty stack
-Stack* screate() {
+Stack* stack_create() {
     Stack *s;
 
     s = (Stack*)malloc(sizeof(Stack));
@@ -27,7 +27,7 @@ Stack* screate() {
 }
 
 // Push value 'i' into the top of the stack 's'
-void spush(Stack *s, int i) {
+void stack_push(Stack *s, int i) {
     SCell *c;
 
     // Initialize a SCell with the value 'i'
@@ -43,11 +43,11 @@ void spush(Stack *s, int i) {
 
 // Pop and return a value from the stack 's',
 // checking and exiting with failure if it's empty
-int spop(Stack *s) {
+int stack_pop(Stack *s) {
     SCell *c;
     int v;
 
-    if (slength(s) == 0) {
+    if (stack_length(s) == 0) {
         fprintf(stderr, "The stack is empty! Cannot pop.\n");
         exit(EXIT_FAILURE);
     }
@@ -67,29 +67,29 @@ int spop(Stack *s) {
 }
 
 // Print a representation of the stack 's' to STDOUT
-void sprint(Stack *s) {
+void stack_print(Stack *s) {
     SCell *c;
     Stack *inv; // stack for inverting the order of the elements
 
-    if (slength(s) == 0) {
+    if (stack_length(s) == 0) {
         printf("[]\n");
         return;
     }
 
-    inv = screate();
-    for (c = s->top; c != NULL; c = c->next) spush(inv, c->value);
+    inv = stack_create();
+    for (c = s->top; c != NULL; c = c->next) stack_push(inv, c->value);
 
     printf("[");
-    printf("%d", spop(inv));
-    while (slength(inv) > 0) printf(", %d", spop(inv));
+    printf("%d", stack_pop(inv));
+    while (stack_length(inv) > 0) printf(", %d", stack_pop(inv));
     printf("]");
     printf("\n");
 
-    sfree(inv);
+    stack_free(inv);
 }
 
 // Deallocate stack 's'
-void sfree(Stack *s) {
+void stack_free(Stack *s) {
     SCell *a, *b;
 
     a = s->top;
@@ -103,6 +103,6 @@ void sfree(Stack *s) {
 }
 
 // Get the length of the stack 's'
-int slength(Stack *s) {
+int stack_length(Stack *s) {
     return s->length;
 }

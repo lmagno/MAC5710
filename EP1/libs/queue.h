@@ -7,11 +7,11 @@
 typedef struct _QCell QCell;
 typedef struct _Queue Queue;
 
-Queue* qcreate();
-void   qpush(Queue *q, int i);
-int    qpop(Queue *q);
-void   qfree(Queue *q);
-void   qprint(Queue *q);
-int    qlength(Queue* q);
+Queue* queue_create();
+void   queue_push(Queue *q, int i);
+int    queue_pop(Queue *q);
+void   queue_free(Queue *q);
+void   queue_print(Queue *q);
+int    queue_length(Queue* q);
 
 #endif
