@@ -108,7 +108,7 @@ void graph_print(Graph *g) {
                 if(nup    &&    nup->shortest && (   nup->dist > n->dist))    up = true;
                 if(ndown  &&  ndown->shortest && ( ndown->dist > n->dist))  down = true;
 
-                
+
                 // Print accordingly
                 if(left)
                     printf("←");
@@ -154,7 +154,7 @@ void graph_print_dist(Graph *g) {
             else if(i == g->si && j == g->sj)
                 printf(" s ");
             else if (n->dist == INT_MAX)
-                printf("%3d", -1);
+                printf(" ∞ ");
             else
                 printf("%3d", n->dist);
         }
