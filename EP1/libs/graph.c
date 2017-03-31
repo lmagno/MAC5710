@@ -75,12 +75,16 @@ void graph_print(Graph *g) {
     // dx = g->ti - g->si;
     // dy = g->tj - g->sj;
 
-    printf("   ");
+    printf("\n");
+    printf("     ");
     for(j = 0; j < g->cols; j++) printf("%3d", j);
+    printf("\n");
+    printf("       ");
+    for(j = 0; j < g->cols; j++) printf("̅ ̅ ̅ ");
     printf("\n");
 
     for(i = 0; i < g->rows; i++) {
-        printf("%3d", i);
+        printf("%3d⎸ ", i);
         for(j = 0; j < g->cols; j++) {
             n = g->nodes[i][j];
 
@@ -90,6 +94,8 @@ void graph_print(Graph *g) {
                 printf(" t ");
             else if(i == g->si && j == g->sj)
                 printf(" s ");
+            else if(n->dist == INT_MAX)
+                printf("░░░");
             else if (!n->shortest)
                 printf("   ");
             else {
