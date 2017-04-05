@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS = -Wall -ansi -pedantic -O2
 
 LIBNAMES = graph stack queue
 LIBFILES = $(addprefix libs/, $(LIBNAMES))

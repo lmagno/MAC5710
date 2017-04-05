@@ -6,8 +6,8 @@
 #include <limits.h>
 #include <stdbool.h>
 
-// #define TRUE 1
-// #define FALSE 0
+/* #define TRUE 1*/
+/* #define FALSE 0*/
 
 typedef struct _Node {
     int i, j;

@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include "queue.h"
 
-// A single cell of the queue
+/* A single cell of the queue*/
 struct _QCell {
     int value;
     struct _QCell *next;
 };
 
 
-// The header of the queue
+/* The header of the queue*/
 struct _Queue {
     int length;
     QCell *first;
@@ -17,7 +17,7 @@ struct _Queue {
 };
 
 
-// Allocate an empty queue
+/* Allocate an empty queue*/
 Queue* queue_create() {
     Queue *q;
 
@@ -30,16 +30,16 @@ Queue* queue_create() {
     return q;
 }
 
-// Push a value 'i' into the queue 'q'
+/* Push a value 'i' into the queue 'q'*/
 void queue_push(Queue *q, int i) {
     QCell *c;
 
-    // Initalize a QCell with the value 'i'
+    /* Initalize a QCell with the value 'i'*/
     c = (QCell*)malloc(sizeof(QCell));
     c->value = i;
     c->next = NULL;
 
-    // Add it to the end of the queue
+    /* Add it to the end of the queue*/
     if (queue_length(q) == 0) {
         q->first = c;
         q->last  = c;
@@ -51,8 +51,8 @@ void queue_push(Queue *q, int i) {
     q->length += 1;
 }
 
-// Pop and return a value from the queue 'q',
-// checking and exiting with failure if it's empty
+/* Pop and return a value from the queue 'q',*/
+/* checking and exiting with failure if it's empty*/
 int queue_pop(Queue *q) {
     int v;
     QCell *c;
@@ -62,13 +62,13 @@ int queue_pop(Queue *q) {
         exit(EXIT_FAILURE);
     }
 
-    // Pop first cell
+    /* Pop first cell*/
     c = q->first;
 
-    // Extract its value
+    /* Extract its value*/
     v = c->value;
 
-    // Set the second cell as the new first
+    /* Set the second cell as the new first*/
     q->first = c->next;
     q->length -= 1;
 
@@ -76,7 +76,7 @@ int queue_pop(Queue *q) {
     return v;
 }
 
-// Print a representation of the queue 'q' to STDOUT
+/* Print a representation of the queue 'q' to STDOUT*/
 void queue_print(Queue *q) {
     QCell *c;
 
@@ -93,7 +93,7 @@ void queue_print(Queue *q) {
     printf("\n");
 }
 
-// Deallocate the queue 'q'
+/* Deallocate the queue 'q'*/
 void queue_free(Queue *q) {
     QCell *a, *b;
 
@@ -107,7 +107,7 @@ void queue_free(Queue *q) {
     free(q);
 }
 
-// Get the length of the queue 'q'
+/* Get the length of the queue 'q'*/
 int queue_length(Queue *q) {
     return q->length;
 }

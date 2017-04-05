@@ -67,24 +67,24 @@ Node** node_neighbors(Graph *g, Node *n, int *nlen) {
 
 void graph_print(Graph *g) {
     int i, j;
-    // int dx, dy;
+    /* int dx, dy;*/
     Node *n;
     Node *nleft, *nright, *nup, *ndown;
     bool left, right, up, down;
 
-    // dx = g->ti - g->si;
-    // dy = g->tj - g->sj;
+    /* dx = g->ti - g->si;*/
+    /* dy = g->tj - g->sj;*/
 
     printf("\n");
     printf("     ");
-    for(j = 0; j < g->cols; j++) printf("%3d", j);
+    for(j = 0; j < g->cols; j++) printf("%-3d", j);
     printf("\n");
-    printf("       ");
-    for(j = 0; j < g->cols; j++) printf("̅ ̅ ̅ ");
-    printf("\n");
+    /* printf("       ");*/
+    /* for(j = 0; j < g->cols; j++) printf("̅ ̅ ̅ ");*/
+    /* printf("\n");*/
 
     for(i = 0; i < g->rows; i++) {
-        printf("%3d⎸ ", i);
+        printf("%3d ", i);
         for(j = 0; j < g->cols; j++) {
             n = g->nodes[i][j];
 
@@ -102,20 +102,20 @@ void graph_print(Graph *g) {
                 nleft = nright = nup = ndown = NULL;
                 left  =  right =  up =  down = false;
 
-                // Get the neighboring nodes
+                /* Get the neighboring nodes*/
                 if(j-1 >= 0)       nleft = g->nodes[i][j-1];
                 if(i-1 >= 0)         nup = g->nodes[i-1][j];
                 if(j+1 < g->cols) nright = g->nodes[i][j+1];
                 if(i+1 < g->rows)  ndown = g->nodes[i+1][j];
 
-                // Get which will lead along a shortest path to the end point
+                /* Get which will lead along a shortest path to the end point*/
                 if(nleft  &&  nleft->shortest && ( nleft->dist > n->dist))  left = true;
                 if(nright && nright->shortest && (nright->dist > n->dist)) right = true;
                 if(nup    &&    nup->shortest && (   nup->dist > n->dist))    up = true;
                 if(ndown  &&  ndown->shortest && ( ndown->dist > n->dist))  down = true;
 
 
-                // Print accordingly
+                /* Print accordingly*/
                 if(left)
                     printf("←");
                 else
@@ -168,12 +168,13 @@ void graph_print_dist(Graph *g) {
     }
 }
 
-// Load graph data from file 'filename'
+/* Load graph data from file 'filename'*/
 Graph* graph_load(const char *filename) {
     int i, j, v;
     int ti, tj;
     int si, sj;
     int rows, cols;
+
     Graph *g;
     FILE *file = NULL;
 
@@ -183,9 +184,18 @@ Graph* graph_load(const char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    fscanf(file, "%d %d", &ti, &tj);
-    fscanf(file, "%d %d", &si, &sj);
-    fscanf(file, "%d %d", &rows, &cols);
+    if(fscanf(file, "%d %d", &ti, &tj) != 2) {
+        fprintf(stderr, "ERROR: While reading input file %s.", filename);
+        exit(EXIT_FAILURE);
+    }
+    if(fscanf(file, "%d %d", &si, &sj) != 2) {
+        fprintf(stderr, "ERROR: While reading input file %s.", filename);
+        exit(EXIT_FAILURE);
+    }
+    if(fscanf(file, "%d %d", &rows, &cols) != 2) {
+        fprintf(stderr, "ERROR: While reading input file %s.", filename);
+        exit(EXIT_FAILURE);
+    }
 
     if (ti < 0 || tj < 0 || ti >= rows || tj >= cols) {
         fprintf(stderr, "ERROR: Start index out-of-bounds.\n");
@@ -208,7 +218,10 @@ Graph* graph_load(const char *filename) {
 
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
-            fscanf(file, "%d", &v);
+            if(fscanf(file, "%d", &v) != 1) {
+                fprintf(stderr, "ERROR: While reading file %s.", filename);
+                exit(EXIT_FAILURE);
+            }
             if(v == 0)
                 g->nodes[i][j] = node_create(i, j);
         }
@@ -239,7 +252,7 @@ Graph* graph_load(const char *filename) {
     return g;
 }
 
-// Unmark all nodes of the graph 'g'
+/* Unmark all nodes of the graph 'g'*/
 void graph_unmark_nodes(Graph *g) {
     int i, j;
     Node *n;
