@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "libs/matrix.h"
-#include "libs/stack.h"
 #include "libs/queue.h"
 
 int  min(int a, int b);
