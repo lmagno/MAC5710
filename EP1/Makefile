@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -O2
+CFLAGS = -g -Wall -ansi -pedantic -O2
 
 LIBNAMES = matrix queue
 LIBFILES = $(addprefix libs/, $(LIBNAMES))

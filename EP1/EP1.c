@@ -1,11 +1,15 @@
+/*****************************************************/
+/* Nome: Lucas Magno                                 */
+/* Número USP: 7994983                               */
+/* Exercício-Programa 1                              */
+/*****************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "libs/matrix.h"
 #include "libs/queue.h"
 
 int  min(int a, int b);
-void coordinates_to_hash(Matrix *m, int i, int j, int *hash);
-void hash_to_coordinates(Matrix *m, int *i, int *j, int hash);
 void shortest_distances(Matrix *m);
 int  shortest_paths(Matrix *m, Node *n);
 
@@ -19,16 +23,21 @@ int main(int argc, char **argv) {
         filename = argv[i];
         printf("\n\n=========================%s=========================\n", filename);
         m = matrix_load(filename);
-        s = m->nodes[m->si][m->sj];
 
         shortest_distances(m);
-        /* matrix_print_dist(m);*/
+
+        s = m->nodes[m->si][m->sj];
+        if(s->dist == INT_MAX) {
+            matrix_print(m);
+            printf("The exit is unreachable.\n");
+            matrix_free(m);
+            continue;
+        }
 
         npaths = shortest_paths(m, s);
-        printf("\n");
         printf("Length of shortest paths: %d\n", s->dist);
         printf("Number of shortest paths: %d\n", npaths);
-        /* matrix_print(m); */
+
         matrix_free(m);
     }
 
@@ -41,7 +50,7 @@ int min(int a, int b) {
 }
 
 /* Calculate the shortest distance of every node in the*/
-/* matrix 'g' to the starting point 't' at index (ti, tj),*/
+/* matrix 'm' to the starting point 't' at index (ti, tj),*/
 /* keeping the result in the appropriate field in each node.*/
 void shortest_distances(Matrix *m) {
     int k;
@@ -93,7 +102,7 @@ void shortest_distances(Matrix *m) {
     queue_free(q);
 }
 
-/* Recursively calculates the shortest paths of matrix 'g', starting at
+/* Recursively calculates the shortest paths of matrix 'm', starting at
 the node 'n'. Prints to stdin every time it finds a complete shortest path,
 and returns the number of complete shortest paths found from the node 'n' */
 int shortest_paths(Matrix *m, Node *n) {

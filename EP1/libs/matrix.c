@@ -1,5 +1,6 @@
 #include "matrix.h"
 
+/* Create a single node (element) of a matrix with coordinates (i, j) */
 Node* node_create(int i, int j) {
     Node *n;
 
@@ -14,6 +15,7 @@ Node* node_create(int i, int j) {
     return n;
 }
 
+/* Create an uninitialized matrix of size rows×cols */
 Matrix* matrix_create(int rows, int cols) {
     int i;
     Matrix *m;
@@ -31,6 +33,7 @@ Matrix* matrix_create(int rows, int cols) {
     return m;
 }
 
+/* Deallocate the matrix 'm' */
 void matrix_free(Matrix *m) {
     int i, j;
 
@@ -42,6 +45,7 @@ void matrix_free(Matrix *m) {
     free(m);
 }
 
+/* Find all 'nlen' non-null neighbors of node 'n' in matrix 'm' */
 Node** node_neighbors(Matrix *m, Node *n, int *nlen) {
     int i = n->i;
     int j = n->j;
@@ -65,6 +69,8 @@ Node** node_neighbors(Matrix *m, Node *n, int *nlen) {
     return neighbors;
 }
 
+/* Print a representation of the matrix to stdin, annotating the invalid cells,
+the unreachable ones and the shortest path */
 void matrix_print(Matrix *m) {
     int i, j;
     /* int dx, dy;*/
@@ -138,6 +144,7 @@ void matrix_print(Matrix *m) {
         }
         printf("\n");
     }
+    printf("\n");
 }
 
 void matrix_print_dist(Matrix *m) {
@@ -252,7 +259,7 @@ Matrix* matrix_load(const char *filename) {
     return m;
 }
 
-/* Unmark all nodes of the matrix 'g'*/
+/* Unmark all nodes of the matrix 'm'*/
 void matrix_unmark_nodes(Matrix *m) {
     int i, j;
     Node *n;
