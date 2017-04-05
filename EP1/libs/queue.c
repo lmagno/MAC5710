@@ -4,7 +4,7 @@
 
 /* A single cell of the queue*/
 struct _QCell {
-    int value;
+    Node *value;
     struct _QCell *next;
 };
 
@@ -31,12 +31,12 @@ Queue* queue_create() {
 }
 
 /* Push a value 'i' into the queue 'q'*/
-void queue_push(Queue *q, int i) {
+void queue_push(Queue *q, Node *n) {
     QCell *c;
 
     /* Initalize a QCell with the value 'i'*/
     c = (QCell*)malloc(sizeof(QCell));
-    c->value = i;
+    c->value = n;
     c->next = NULL;
 
     /* Add it to the end of the queue*/
@@ -53,8 +53,8 @@ void queue_push(Queue *q, int i) {
 
 /* Pop and return a value from the queue 'q',*/
 /* checking and exiting with failure if it's empty*/
-int queue_pop(Queue *q) {
-    int v;
+Node* queue_pop(Queue *q) {
+    Node *n;
     QCell *c;
 
     if (queue_length(q) == 0) {
@@ -66,14 +66,14 @@ int queue_pop(Queue *q) {
     c = q->first;
 
     /* Extract its value*/
-    v = c->value;
+    n = c->value;
 
     /* Set the second cell as the new first*/
     q->first = c->next;
     q->length -= 1;
 
     free(c);
-    return v;
+    return n;
 }
 
 /* Print a representation of the queue 'q' to STDOUT*/
@@ -87,8 +87,8 @@ void queue_print(Queue *q) {
 
     c = q->first;
     printf("[");
-    printf("%d", c->value);
-    for (c = c->next; c != NULL; c = c->next) printf(", %d", c->value);
+    printf("(%d,%d)", c->value->i, c->value->j);
+    for (c = c->next; c != NULL; c = c->next) printf(", (%d,%d)", c->value->i, c->value->j);
     printf("]");
     printf("\n");
 }

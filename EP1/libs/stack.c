@@ -4,7 +4,7 @@
 
 /* A single cell of the stack*/
 struct _SCell {
-    int value;
+    Node *value;
     struct _SCell *next;
 };
 
@@ -27,12 +27,12 @@ Stack* stack_create() {
 }
 
 /* Push value 'i' into the top of the stack 's'*/
-void stack_push(Stack *s, int i) {
+void stack_push(Stack *s, Node *n) {
     SCell *c;
 
     /* Initialize a SCell with the value 'i'*/
     c = (SCell*)malloc(sizeof(SCell));
-    c->value = i;
+    c->value = n;
 
     /* Add it to the top of the stack*/
     c->next = s->top;
@@ -43,9 +43,9 @@ void stack_push(Stack *s, int i) {
 
 /* Pop and return a value from the stack 's',*/
 /* checking and exiting with failure if it's empty*/
-int stack_pop(Stack *s) {
+Node* stack_pop(Stack *s) {
     SCell *c;
-    int v;
+    Node *n;
 
     if (stack_length(s) == 0) {
         fprintf(stderr, "The stack is empty! Cannot pop.\n");
@@ -56,20 +56,21 @@ int stack_pop(Stack *s) {
     c = s->top;
 
     /* Extract its value*/
-    v = c->value;
+    n = c->value;
 
     /* Set the second cell as the top*/
     s->top = c->next;
     s->length -= 1;
 
     free(c);
-    return v;
+    return n;
 }
 
 /* Print a representation of the stack 's' to STDOUT*/
 void stack_print(Stack *s) {
     SCell *c;
     Stack *inv; /* stack for inverting the order of the elements*/
+    Node *n;
 
     if (stack_length(s) == 0) {
         printf("[]\n");
@@ -80,8 +81,12 @@ void stack_print(Stack *s) {
     for (c = s->top; c != NULL; c = c->next) stack_push(inv, c->value);
 
     printf("[");
-    printf("%d", stack_pop(inv));
-    while (stack_length(inv) > 0) printf(", %d", stack_pop(inv));
+    n = stack_pop(inv);
+    printf("(%d,%d)", n->i, n->j);
+    while (stack_length(inv) > 0) {
+        n = stack_pop(inv);
+        printf(", (%d,%d)", n->i, n->j);
+    }
     printf("]");
     printf("\n");
 

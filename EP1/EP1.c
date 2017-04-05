@@ -34,25 +34,14 @@ int min(int a, int b) {
     return a < b ? a : b;
 }
 
-/* Functions to convert between a node's coordinates and its hash*/
-/* for use in the queue*/
-void coordinates_to_hash(Graph *g, int i, int j, int *hash) {
-    *hash = g->cols*i + j;
-}
-
-void hash_to_coordinates(Graph *g, int *i, int *j, int hash) {
-    *i = hash/g->cols;
-    *j = hash%g->cols;
-}
-
 /* Calculate the shortest distance of every node in the*/
 /* graph 'g' to the starting point 't' at index (ti, tj),*/
 /* keeping the result in the appropriate field in each node.*/
 void shortest_distances(Graph *g) {
-    int i, j, k;
+    int k;
     int ti = g->ti;
     int tj = g->tj;
-    int hash, nlen, mindist;
+    int nlen, mindist;
     Queue *q = queue_create();
     Node **neighbors, *n, *neighbor;
 
@@ -64,14 +53,11 @@ void shortest_distances(Graph *g) {
     n->dist    = -1;
     n->marked  = true;
 
-    coordinates_to_hash(g, ti, tj, &hash);
-    queue_push(q, hash);
+    queue_push(q, n);
 
     while(queue_length(q) > 0) {
-        /* Take a hash out of the queue and get the corresponding node*/
-        hash = queue_pop(q);
-        hash_to_coordinates(g, &i, &j, hash);
-        n = g->nodes[i][j];
+        /* Take a node out of the queue*/
+        n = queue_pop(q);
 
         /* Get the neighbors of the node 'n'*/
         neighbors = node_neighbors(g, n, &nlen);
@@ -88,8 +74,7 @@ void shortest_distances(Graph *g) {
                 /* Mark the neighbor and put it in the queue*/
                 neighbor->marked = true;
 
-                coordinates_to_hash(g, neighbor->i, neighbor->j, &hash);
-                queue_push(q, hash);
+                queue_push(q, neighbor);
             }
         }
         free(neighbors);
@@ -103,8 +88,8 @@ void shortest_distances(Graph *g) {
 }
 
 void shortest_paths(Graph *g) {
-    int i, j, k;
-    int index, nlen, mindist;
+    int k;
+    int nlen, mindist;
     int si = g->si;
     int sj = g->sj;
     Node *n, *neighbor, **neighbors;
@@ -114,14 +99,11 @@ void shortest_paths(Graph *g) {
     /* Start with the end node and put it in the queue*/
     n = g->nodes[si][sj];
     n->shortest = true;
-    coordinates_to_hash(g, si, sj, &index);
-    queue_push(q, index);
+    queue_push(q, n);
 
     while(queue_length(q) > 0) {
-        /* Take a hash out of the queue and get the corresponding node*/
-        index = queue_pop(q);
-        hash_to_coordinates(g, &i, &j, index);
-        n = g->nodes[i][j];
+        /* Take a node out of the queue*/
+        n = queue_pop(q);
 
         /* Get the neighbors of the node 'n'*/
         neighbors = node_neighbors(g, n, &nlen);
@@ -141,8 +123,7 @@ void shortest_paths(Graph *g) {
             if(neighbor->dist == mindist) {
                 neighbor->shortest = true;
 
-                coordinates_to_hash(g, neighbor->i, neighbor->j, &index);
-                queue_push(q, index);
+                queue_push(q, neighbor);
             }
         }
     }
