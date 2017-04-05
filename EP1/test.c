@@ -1,19 +1,19 @@
 #include <stdio.h>
 #include "libs/stack.h"
 #include "libs/queue.h"
-#include "libs/graph.h"
+#include "libs/matrix.h"
 
 int main() {
     Stack *s;
     Queue *q;
-    Graph *g;
+    Matrix *m;
 
-    printf("=================Graph=================\n\n");
+    printf("=================Matrix=================\n\n");
     printf("\n");
-    g = graph_load("data/input.dat");
+    m = matrix_load("data/input.dat");
 
-    graph_print_dist(g);
-    graph_free(g);
+    matrix_print_dist(m);
+    matrix_free(m);
 
     printf("=================Stack=================\n\n");
     s = stack_create();

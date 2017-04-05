@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "graph.h"
+#include "matrix.h"
 
 typedef struct _SCell SCell;
 typedef struct _Stack Stack;

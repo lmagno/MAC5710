@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "graph.h"
+#include "matrix.h"
 
 typedef struct _QCell QCell;
 typedef struct _Queue Queue;

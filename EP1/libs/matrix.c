@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "matrix.h"
 
 Node* node_create(int i, int j) {
     Node *n;
@@ -14,85 +14,85 @@ Node* node_create(int i, int j) {
     return n;
 }
 
-Graph* graph_create(int rows, int cols) {
+Matrix* matrix_create(int rows, int cols) {
     int i;
-    Graph *g;
+    Matrix *m;
 
-    g = (Graph*)malloc(sizeof(Graph));
+    m = (Matrix*)malloc(sizeof(Matrix));
 
-    g->rows = rows;
-    g->cols = cols;
+    m->rows = rows;
+    m->cols = cols;
 
-    g->nodes = (Node***)malloc(rows*sizeof(Node**));
+    m->nodes = (Node***)malloc(rows*sizeof(Node**));
 
     for(i = 0; i < rows; i++)
-        g->nodes[i] = (Node**)calloc(cols, sizeof(Node*));
+        m->nodes[i] = (Node**)calloc(cols, sizeof(Node*));
 
-    return g;
+    return m;
 }
 
-void graph_free(Graph *g) {
+void matrix_free(Matrix *m) {
     int i, j;
 
-    for(i = 0; i < g->rows; i++) {
-        for(j = 0; j < g->cols; j++) free(g->nodes[i][j]);
-        free(g->nodes[i]);
+    for(i = 0; i < m->rows; i++) {
+        for(j = 0; j < m->cols; j++) free(m->nodes[i][j]);
+        free(m->nodes[i]);
     }
-    free(g->nodes);
-    free(g);
+    free(m->nodes);
+    free(m);
 }
 
-Node** node_neighbors(Graph *g, Node *n, int *nlen) {
+Node** node_neighbors(Matrix *m, Node *n, int *nlen) {
     int i = n->i;
     int j = n->j;
     int k;
     Node **neighbors;
 
-    if(i < 0 || j < 0 || i >= g->rows || i >= g->cols) {
-        fprintf(stderr, "ERROR: Index Out-of-bounds. Graph has dimensions (%d, %d), can't get node at (%d, %d).\n", g->rows, g->cols, i, j);
+    if(i < 0 || j < 0 || i >= m->rows || i >= m->cols) {
+        fprintf(stderr, "ERROR: Index Out-of-bounds. Matrix has dimensions (%d, %d), can't get node at (%d, %d).\n", m->rows, m->cols, i, j);
         exit(EXIT_FAILURE);
     }
 
     neighbors = (Node**)calloc(4, sizeof(Node*));
 
     k = 0;
-    if(i-1 >= 0       && g->nodes[i-1][j]) neighbors[k++] = g->nodes[i-1][j];
-    if(j-1 >= 0       && g->nodes[i][j-1]) neighbors[k++] = g->nodes[i][j-1];
-    if(i+1 <  g->rows && g->nodes[i+1][j]) neighbors[k++] = g->nodes[i+1][j];
-    if(j+1 <  g->cols && g->nodes[i][j+1]) neighbors[k++] = g->nodes[i][j+1];
+    if(i-1 >= 0       && m->nodes[i-1][j]) neighbors[k++] = m->nodes[i-1][j];
+    if(j-1 >= 0       && m->nodes[i][j-1]) neighbors[k++] = m->nodes[i][j-1];
+    if(i+1 <  m->rows && m->nodes[i+1][j]) neighbors[k++] = m->nodes[i+1][j];
+    if(j+1 <  m->cols && m->nodes[i][j+1]) neighbors[k++] = m->nodes[i][j+1];
 
     *nlen = k;
     return neighbors;
 }
 
-void graph_print(Graph *g) {
+void matrix_print(Matrix *m) {
     int i, j;
     /* int dx, dy;*/
     Node *n;
     Node *nleft, *nright, *nup, *ndown;
     bool left, right, up, down;
 
-    /* dx = g->ti - g->si;*/
-    /* dy = g->tj - g->sj;*/
+    /* dx = m->ti - m->si;*/
+    /* dy = m->tj - m->sj;*/
 
     printf("\n");
     printf("     ");
-    for(j = 0; j < g->cols; j++) printf("%-3d", j);
+    for(j = 0; j < m->cols; j++) printf("%-3d", j);
     printf("\n");
     /* printf("       ");*/
-    /* for(j = 0; j < g->cols; j++) printf("̅ ̅ ̅ ");*/
+    /* for(j = 0; j < m->cols; j++) printf("̅ ̅ ̅ ");*/
     /* printf("\n");*/
 
-    for(i = 0; i < g->rows; i++) {
+    for(i = 0; i < m->rows; i++) {
         printf("%3d ", i);
-        for(j = 0; j < g->cols; j++) {
-            n = g->nodes[i][j];
+        for(j = 0; j < m->cols; j++) {
+            n = m->nodes[i][j];
 
             if(!n)
                 printf("███");
-            else if(i == g->ti && j == g->tj)
+            else if(i == m->ti && j == m->tj)
                 printf(" t ");
-            else if(i == g->si && j == g->sj)
+            else if(i == m->si && j == m->sj)
                 printf(" s ");
             else if(n->dist == INT_MAX)
                 printf("░░░");
@@ -103,10 +103,10 @@ void graph_print(Graph *g) {
                 left  =  right =  up =  down = false;
 
                 /* Get the neighboring nodes*/
-                if(j-1 >= 0)       nleft = g->nodes[i][j-1];
-                if(i-1 >= 0)         nup = g->nodes[i-1][j];
-                if(j+1 < g->cols) nright = g->nodes[i][j+1];
-                if(i+1 < g->rows)  ndown = g->nodes[i+1][j];
+                if(j-1 >= 0)       nleft = m->nodes[i][j-1];
+                if(i-1 >= 0)         nup = m->nodes[i-1][j];
+                if(j+1 < m->cols) nright = m->nodes[i][j+1];
+                if(i+1 < m->rows)  ndown = m->nodes[i+1][j];
 
                 /* Get which will lead along a shortest path to the end point*/
                 if(nleft  &&  nleft->shortest && ( nleft->dist > n->dist))  left = true;
@@ -140,24 +140,24 @@ void graph_print(Graph *g) {
     }
 }
 
-void graph_print_dist(Graph *g) {
+void matrix_print_dist(Matrix *m) {
     int i, j;
     Node *n;
 
     printf("   ");
-    for(j = 0; j < g->cols; j++) printf("%3d", j);
+    for(j = 0; j < m->cols; j++) printf("%3d", j);
     printf("\n");
 
-    for(i = 0; i < g->rows; i++) {
+    for(i = 0; i < m->rows; i++) {
         printf("%3d", i);
-        for(j = 0; j < g->cols; j++) {
-            n = g->nodes[i][j];
+        for(j = 0; j < m->cols; j++) {
+            n = m->nodes[i][j];
 
             if(!n)
                 printf("███");
-            else if(i == g->ti && j == g->tj)
+            else if(i == m->ti && j == m->tj)
                 printf(" t ");
-            else if(i == g->si && j == g->sj)
+            else if(i == m->si && j == m->sj)
                 printf(" s ");
             else if (n->dist == INT_MAX)
                 printf(" ∞ ");
@@ -168,14 +168,14 @@ void graph_print_dist(Graph *g) {
     }
 }
 
-/* Load graph data from file 'filename'*/
-Graph* graph_load(const char *filename) {
+/* Load matrix data from file 'filename'*/
+Matrix* matrix_load(const char *filename) {
     int i, j, v;
     int ti, tj;
     int si, sj;
     int rows, cols;
 
-    Graph *g;
+    Matrix *m;
     FILE *file = NULL;
 
     file = fopen(filename, "r");
@@ -200,7 +200,7 @@ Graph* graph_load(const char *filename) {
     if (ti < 0 || tj < 0 || ti >= rows || tj >= cols) {
         fprintf(stderr, "ERROR: Start index out-of-bounds.\n");
         fprintf(stderr, "\tIndex = (%d, %d).\n", ti, tj);
-        fprintf(stderr, "\tGraph dimensions = (%d, %d).\n", rows, cols);
+        fprintf(stderr, "\tMatrix dimensions = (%d, %d).\n", rows, cols);
         fclose(file);
         exit(EXIT_FAILURE);
     }
@@ -208,13 +208,13 @@ Graph* graph_load(const char *filename) {
     if (si < 0 || sj < 0 || si >= rows || sj >= cols) {
         fprintf(stderr, "ERROR: End index out-of-bounds.\n");
         fprintf(stderr, "\tIndex = (%d, %d).\n", si, sj);
-        fprintf(stderr, "\tGraph dimensions = (%d, %d).\n", rows, cols);
+        fprintf(stderr, "\tMatrix dimensions = (%d, %d).\n", rows, cols);
         fclose(file);
         exit(EXIT_FAILURE);
     }
 
 
-    g = graph_create(rows, cols);
+    m = matrix_create(rows, cols);
 
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
@@ -223,7 +223,7 @@ Graph* graph_load(const char *filename) {
                 exit(EXIT_FAILURE);
             }
             if(v == 0)
-                g->nodes[i][j] = node_create(i, j);
+                m->nodes[i][j] = node_create(i, j);
         }
     }
 
@@ -234,32 +234,32 @@ Graph* graph_load(const char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    if(!g->nodes[ti][tj]) {
+    if(!m->nodes[ti][tj]) {
         fprintf(stderr, "ERROR: Start index (%d, %d) is a wall.\n", ti, tj);
         exit(EXIT_FAILURE);
     }
 
-    if(!g->nodes[si][sj]) {
+    if(!m->nodes[si][sj]) {
         fprintf(stderr, "ERROR: End index (%d, %d) is a wall.\n", si, sj);
         exit(EXIT_FAILURE);
     }
 
-    g->ti = ti;
-    g->tj = tj;
-    g->si = si;
-    g->sj = sj;
+    m->ti = ti;
+    m->tj = tj;
+    m->si = si;
+    m->sj = sj;
 
-    return g;
+    return m;
 }
 
-/* Unmark all nodes of the graph 'g'*/
-void graph_unmark_nodes(Graph *g) {
+/* Unmark all nodes of the matrix 'g'*/
+void matrix_unmark_nodes(Matrix *m) {
     int i, j;
     Node *n;
 
-    for(i = 0; i < g->rows; i++) {
-        for(j = 0; j < g->cols; j++) {
-            n = g->nodes[i][j];
+    for(i = 0; i < m->rows; i++) {
+        for(j = 0; j < m->cols; j++) {
+            n = m->nodes[i][j];
             if(n)
                 n->marked = false;
         }

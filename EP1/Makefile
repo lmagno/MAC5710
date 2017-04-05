@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -O2
 
-LIBNAMES = graph stack queue
+LIBNAMES = matrix stack queue
 LIBFILES = $(addprefix libs/, $(LIBNAMES))
 HEADERS = $(addsuffix .h, $(LIBFILES))
 SOURCES = $(addsuffix .c, $(LIBFILES))
