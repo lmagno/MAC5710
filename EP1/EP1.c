@@ -8,21 +8,28 @@ int min(int a, int b);
 void coordinates_to_hash(Graph *g, int i, int j, int *hash);
 void hash_to_coordinates(Graph *g, int *i, int *j, int hash);
 void shortest_distances(Graph *g);
-void shortest_paths(Graph *g);
+int shortest_paths(Graph *g, Node *n);
 
 int main(int argc, char **argv) {
-    int i;
+    int i, npaths;
     Graph *g;
     char *filename;
+    Node *s;
 
     for(i = 1; i < argc; i++) {
         filename = argv[i];
         printf("\n\n=========================%s=========================\n", filename);
         g = graph_load(filename);
+        s = g->nodes[g->si][g->sj];
+
         shortest_distances(g);
         /* graph_print_dist(g);*/
-        shortest_paths(g);
-        graph_print(g);
+
+        npaths = shortest_paths(g, s);
+        printf("\n");
+        printf("Length of shortest paths: %d\n", s->dist);
+        printf("Number of shortest paths: %d\n", npaths);
+        /* graph_print(g); */
         graph_free(g);
     }
 
@@ -87,46 +94,51 @@ void shortest_distances(Graph *g) {
     queue_free(q);
 }
 
-void shortest_paths(Graph *g) {
+/* Recursively calculates the shortest paths of graph 'g', starting at
+the node 'n'. Every time the
+
+
+
+*/
+int shortest_paths(Graph *g, Node *n) {
     int k;
-    int nlen, mindist;
-    int si = g->si;
-    int sj = g->sj;
-    Node *n, *neighbor, **neighbors;
-    Queue *q = queue_create();
+    int nlen, mindist, npaths = 0;
+    Node *neighbor, **neighbors;
 
-
-    /* Start with the end node and put it in the queue*/
-    n = g->nodes[si][sj];
+    /* Mark this node as being part of the current shortest path */
     n->shortest = true;
-    queue_push(q, n);
 
-    while(queue_length(q) > 0) {
-        /* Take a node out of the queue*/
-        n = queue_pop(q);
+    /* Get the neighbors of the current node*/
+    neighbors = node_neighbors(g, n, &nlen);
 
-        /* Get the neighbors of the node 'n'*/
-        neighbors = node_neighbors(g, n, &nlen);
+    /* Get the closest a neighbor of the current node is to 't'*/
+    mindist = n->dist;
+    for(k = 0; k < nlen; k++) {
+        neighbor = neighbors[k];
+        mindist = min(mindist, neighbor->dist);
+    }
 
-        /* Get the closest a neighbor of the node 'n' is to 't'*/
-        mindist = n->dist;
-        for(k = 0; k < nlen; k++) {
-            neighbor = neighbors[k];
-            mindist = min(mindist, neighbor->dist);
-        }
+    if(mindist == 0) {
+        /* If 't' is a neighbor, then this path is a complete shortest path,
+        so we print it and unmark it and return 1, i.e., we found one shortest
+        path so far */
 
-        /* Mark all the neighbors of the node 'n' which are*/
-        /* closest to 't' as being part of a shortest path*/
-        /* and add them to the queue*/
+        graph_print(g);
+        n->shortest = false;
+        return 1;
+    } else {
+        /* Visit all neighbors of the current that will lead to a shortest path
+        summing the number of complete paths found in each */
         for(k = 0; k < nlen; k++) {
             neighbor = neighbors[k];
             if(neighbor->dist == mindist) {
-                neighbor->shortest = true;
-
-                queue_push(q, neighbor);
+                npaths += shortest_paths(g, neighbor);
             }
         }
     }
 
-    queue_free(q);
+    /* Unmark the current node as being part of the current path and
+    return the number of complete shortest paths found through its neighbors */
+    n->shortest = false;
+    return npaths;
 }
