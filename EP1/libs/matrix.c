@@ -69,7 +69,7 @@ Node** node_neighbors(Matrix *m, Node *n, int *nlen) {
     return neighbors;
 }
 
-/* Print a representation of the matrix to stdin, annotating the invalid cells,
+/* Print a representation of the matrix to stdout, annotating the invalid cells,
 the unreachable ones and the shortest path */
 void matrix_print(Matrix *m) {
     int i, j;

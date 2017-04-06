@@ -2,6 +2,11 @@
 /* Nome: Lucas Magno                                 */
 /* Número USP: 7994983                               */
 /* Exercício-Programa 1                              */
+/*                                                   */
+/* Executar o programa da forma:                     */
+/*     $ ./EP1 file1 file2 ...                       */
+/*                                                   */
+/* Resultados são impressos na stdout.               */
 /*****************************************************/
 
 #include <stdio.h>
@@ -22,11 +27,16 @@ int main(int argc, char **argv) {
     for(i = 1; i < argc; i++) {
         filename = argv[i];
         printf("\n\n=========================%s=========================\n", filename);
+
+        /* Load problem */
         m = matrix_load(filename);
 
+        /* Mark every node with its distance from the start point */
         shortest_distances(m);
 
-        s = m->nodes[m->si][m->sj];
+        /* If the distance of the exit from the starting point is
+        INT_MAX, i.e. ∞, then it is unreachable. In this case,
+        there are no shortest paths to find. */
         if(s->dist == INT_MAX) {
             matrix_print(m);
             printf("The exit is unreachable.\n");
@@ -34,6 +44,8 @@ int main(int argc, char **argv) {
             continue;
         }
 
+        /* Find all shortest paths from 's' to 't'*/
+        s = m->nodes[m->si][m->sj];
         npaths = shortest_paths(m, s);
         printf("Length of shortest paths: %d\n", s->dist);
         printf("Number of shortest paths: %d\n", npaths);
@@ -103,7 +115,7 @@ void shortest_distances(Matrix *m) {
 }
 
 /* Recursively calculates the shortest paths of matrix 'm', starting at
-the node 'n'. Prints to stdin every time it finds a complete shortest path,
+the node 'n'. Prints to stdout every time it finds a complete shortest path,
 and returns the number of complete shortest paths found from the node 'n' */
 int shortest_paths(Matrix *m, Node *n) {
     int k;
