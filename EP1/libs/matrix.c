@@ -73,21 +73,14 @@ Node** node_neighbors(Matrix *m, Node *n, int *nlen) {
 the unreachable ones and the shortest path */
 void matrix_print(Matrix *m) {
     int i, j;
-    /* int dx, dy;*/
     Node *n;
     Node *nleft, *nright, *nup, *ndown;
     bool left, right, up, down;
-
-    /* dx = m->ti - m->si;*/
-    /* dy = m->tj - m->sj;*/
 
     printf("\n");
     printf("     ");
     for(j = 0; j < m->cols; j++) printf("%-3d", j);
     printf("\n");
-    /* printf("       ");*/
-    /* for(j = 0; j < m->cols; j++) printf("̅ ̅ ̅ ");*/
-    /* printf("\n");*/
 
     for(i = 0; i < m->rows; i++) {
         printf("%3d ", i);
@@ -122,24 +115,14 @@ void matrix_print(Matrix *m) {
 
 
                 /* Print accordingly*/
-                if(left)
-                    printf("←");
-                else
-                    printf(" ");
+                     if(!left && !right && !up && !down) printf("   ");
+                else if( left && !right && !up && !down) printf(" ← ");
+                else if(!left &&  right && !up && !down) printf(" → ");
+                else if( left &&  right && !up && !down) printf("← →");
+                else if(!left && !right &&  up && !down) printf(" ↑ ");
+                else if(!left && !right && !up &&  down) printf(" ↓ ");
+                else if(!left && !right &&  up &&  down) printf(" ↕ ");
 
-                if(up && down)
-                    printf("↕");
-                else if (up)
-                    printf("↑");
-                else if (down)
-                    printf("↓");
-                else
-                    printf(" ");
-
-                if(right)
-                    printf("→");
-                else
-                    printf(" ");
             }
         }
         printf("\n");
