@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "bst.h"
+#include "queue.h"
 
 #define MAX 100
 
@@ -17,8 +18,10 @@ int main(int argc, char const *argv[]) {
     int maxlen = 0, maxcount = 0;
     char s[MAX], l[MAX];
     BST *b;
+    Queue *q;
 
     b = bst_create();
+    q = queue_create();
     file = fopen(argv[1], "r");
 
     if(!file) {
@@ -39,14 +42,18 @@ int main(int argc, char const *argv[]) {
             bst_insert(b, node_create(cnt, j));
         // printf("%s\n", l);
         // h = hash(l);
+        queue_push(q, l);
         j++;
-        if(feof(file)) break;
+        // if(feof(file)) break;
+        if(j > 20) break;
     }
-    bst_traverse(b);
+    queue_print(q);
+    // bst_traverse(b);
     printf("maxlen = %d\n", maxlen);
     printf("maxcount = %d\n", maxcount);
 
     bst_free(b);
+    queue_free(q);
     fclose(file);
     return 0;
 }
