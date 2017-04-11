@@ -10,10 +10,10 @@ typedef struct Value Value;
 typedef struct Node Node;
 typedef struct BST BST;
 
-Key* key_create(int cnt[26]);
+Key* key_create(int8_t cnt[26]);
 Value* value_create();
 int key_cmp(Key *k1, Key *k2);
-Node* node_create(int cnt[26]);
+Node* node_create(int8_t cnt[26]);
 Queue* node_queue(Node *n);
 BST* bst_create();
 void bst_insert(BST *b, Node *n);

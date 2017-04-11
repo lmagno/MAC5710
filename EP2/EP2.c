@@ -8,11 +8,11 @@
 #define MAX 100
 
 char* lower(char *l, char *s);
-void count(int *cnt, char *l);
+void count(int8_t *cnt, char *l);
 
 int main(int argc, char const *argv[]) {
     FILE *file;
-    int cnt[26];
+    int8_t cnt[26];
     char s[MAX], l[MAX];
     Node *n;
     BST *b;
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
-void count(int *cnt, char *l) {
+void count(int8_t *cnt, char *l) {
     int i, n = strlen(l);
     int a = 'a' - 'a';
     int z = 'z' - 'a';

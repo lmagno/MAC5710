@@ -4,14 +4,14 @@
 /*                         Problem specific datatypes                         */
 /******************************************************************************/
 struct Key {
-    int cnt[26];
+    int8_t cnt[26];
 };
 
 struct Value {
     Queue *queue;
 };
 
-Key* key_create(int cnt[26]) {
+Key* key_create(int8_t cnt[26]) {
     int i;
     Key *k;
 
@@ -53,7 +53,7 @@ struct Node {
     Node *left, *right;
 };
 
-Node* node_create(int cnt[26]) {
+Node* node_create(int8_t cnt[26]) {
     Node *n;
 
     n = (Node*)malloc(sizeof(Node));
