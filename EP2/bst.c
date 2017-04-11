@@ -8,7 +8,7 @@ struct Key {
 };
 
 struct Value {
-    int value;
+    Queue *queue;
 };
 
 Key* key_create(int cnt[26]) {
@@ -16,6 +16,7 @@ Key* key_create(int cnt[26]) {
     Key *k;
 
     k = (Key*)malloc(sizeof(Key));
+    // k->cnt = (int*)malloc(26*sizeof(int));
 
     for(i = 0; i < 26; i++)
         k->cnt[i] = cnt[i];
@@ -23,11 +24,11 @@ Key* key_create(int cnt[26]) {
     return k;
 }
 
-Value* value_create(int value) {
+Value* value_create() {
     Value *v;
 
     v = (Value*)malloc(sizeof(Value));
-    v->value = value;
+    v->queue = queue_create();
 
     return v;
 }
@@ -52,17 +53,30 @@ struct Node {
     Node *left, *right;
 };
 
-Node* node_create(int cnt[26], int value) {
+Node* node_create(int cnt[26]) {
     Node *n;
 
     n = (Node*)malloc(sizeof(Node));
 
     n->key   = key_create(cnt);
-    n->value = value_create(value);
+    n->value = value_create();
     n->left  = NULL;
     n->right = NULL;
 
     return n;
+}
+
+void node_free(Node *n) {
+    if(!n) return;
+
+    node_free(n->left);
+    node_free(n->right);
+
+    // free(n->key->cnt);
+    free(n->key);
+    queue_free(n->value->queue);
+    free(n->value);
+    free(n);
 }
 
 void callback(Node *n) {
@@ -70,9 +84,13 @@ void callback(Node *n) {
     for(i = 0; i < 26; i++)
         printf("%d ", n->key->cnt[i]);
 
-    printf("| %d\n", n->value->value);
+    printf("| ");
+    queue_print(n->value->queue);
 }
 
+Queue* node_queue(Node *n) {
+    return n->value->queue;
+}
 /******************************************************************************/
 /*                                 Generic BST                                */
 /******************************************************************************/
@@ -135,17 +153,6 @@ void _traverse(Node *n, void (*callback)(Node *n)) {
 
 void bst_traverse(BST *b) {
     _traverse(b->root, callback);
-}
-
-void node_free(Node *n) {
-    if(!n) return;
-
-    node_free(n->left);
-    node_free(n->right);
-
-    free(n->key);
-    free(n->value);
-    free(n);
 }
 
 void bst_free(BST *b) {

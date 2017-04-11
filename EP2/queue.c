@@ -3,21 +3,6 @@
 #include "queue.h"
 #include <string.h>
 
-/* A single cell of the queue*/
-struct _QCell {
-    char value[100];
-    struct _QCell *next;
-};
-
-
-/* The header of the queue*/
-struct _Queue {
-    int length;
-    QCell *first;
-    QCell *last;
-};
-
-
 /* Allocate an empty queue*/
 Queue* queue_create() {
     Queue *q;

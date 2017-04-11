@@ -7,6 +7,22 @@
 typedef struct _QCell QCell;
 typedef struct _Queue Queue;
 
+/* A single cell of the queue*/
+struct _QCell {
+    char value[100];
+    struct _QCell *next;
+};
+
+
+/* The header of the queue*/
+struct _Queue {
+    int length;
+    QCell *first;
+    QCell *last;
+};
+
+
+
 Queue* queue_create();
 void   queue_push(Queue *q, char *s);
 void   queue_pop(Queue *q, char *s);

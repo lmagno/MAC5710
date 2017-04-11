@@ -7,21 +7,19 @@
 
 #define MAX 100
 
-int max(int a, int b);
 char* lower(char *l, char *s);
 void count(int *cnt, char *l);
-uint64_t hash(char *l);
 
 int main(int argc, char const *argv[]) {
     FILE *file;
-    int i, j, cnt[26];
-    int maxlen = 0, maxcount = 0;
+    int cnt[26];
     char s[MAX], l[MAX];
+    Node *n;
     BST *b;
-    Queue *q;
+    Key *k;
+    Queue *q, *qmax;
 
     b = bst_create();
-    q = queue_create();
     file = fopen(argv[1], "r");
 
     if(!file) {
@@ -29,37 +27,39 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    j = 1;
+    qmax = NULL;
     while(1) {
+        q = NULL;
         fscanf(file, "%s", s);
         // printf("%s\n", s);
         lower(l, s);
-        maxlen = max(maxlen, strlen(l));
         count(cnt, l);
-        for(i = 0; i < 26; i++) maxcount = max(maxcount, cnt[i]);
 
-        if(!bst_search(b, key_create(cnt)))
-            bst_insert(b, node_create(cnt, j));
-        // printf("%s\n", l);
-        // h = hash(l);
+        k = key_create(cnt);
+        n = bst_search(b, k);
+        free(k);
+        if(!n) {
+            n = node_create(cnt);
+            bst_insert(b, n);
+        }
+
+        q = node_queue(n);
         queue_push(q, l);
-        j++;
-        // if(feof(file)) break;
-        if(j > 20) break;
+
+        if(!qmax)
+            qmax = q;
+        else if(q->length > qmax->length)
+            qmax = q;
+
+        if(feof(file)) break;
     }
-    queue_print(q);
     // bst_traverse(b);
-    printf("maxlen = %d\n", maxlen);
-    printf("maxcount = %d\n", maxcount);
+    printf("Biggest set of anagrams (length = %d):\n", qmax->length);
+    queue_print(qmax);
 
     bst_free(b);
-    queue_free(q);
     fclose(file);
     return 0;
-}
-
-int max(int a, int b) {
-    return a > b ? a : b;
 }
 
 void count(int *cnt, char *l) {
@@ -75,28 +75,6 @@ void count(int *cnt, char *l) {
         cnt[c - 'a'] += 1;
     }
 
-}
-uint64_t hash(char *l) {
-    int i, n = strlen(l);
-    int a = 'a' - 'a';
-    int z = 'z' - 'a';
-    int count[26] = {0};
-    char c;
-    uint64_t h;
-
-    for(i = 0; i < n; i++) {
-        c = l[i];
-        count[c - 'a'] += 1;
-    }
-
-    for(i = a; i <= z; i++) printf("%c ", i + 'a');
-    printf("\n");
-
-    for(i = a; i <= z; i++) {
-        printf("%d ", count[i]);
-    }
-    printf("\n\n");
-    return h;
 }
 
 /* Copy string 's' to string 'l', converting every letter to lowercase */
