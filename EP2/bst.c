@@ -4,18 +4,21 @@
 /*                         Problem specific datatypes                         */
 /******************************************************************************/
 struct Key {
-    int key;
+    int cnt[26];
 };
 
 struct Value {
     int value;
 };
 
-Key* key_create(int key) {
+Key* key_create(int cnt[26]) {
+    int i;
     Key *k;
 
     k = (Key*)malloc(sizeof(Key));
-    k->key = key;
+
+    for(i = 0; i < 26; i++)
+        k->cnt[i] = cnt[i];
 
     return k;
 }
@@ -30,14 +33,16 @@ Value* value_create(int value) {
 }
 
 int key_cmp(Key *k1, Key *k2) {
-    int cmp = k1->key - k2->key;
+    int i;
 
-    if(cmp < 0)
-        return -1;
-    else if (cmp > 0)
-        return 1;
-    else
-        return 0;
+    for(i = 0; i < 26; i++) {
+        if(k1->cnt[i] < k2->cnt[i])
+            return -1;
+        else if(k1->cnt[i] > k2->cnt[i])
+            return 1;
+    }
+
+    return 0;
 }
 
 struct Node {
@@ -47,17 +52,25 @@ struct Node {
     Node *left, *right;
 };
 
-Node* node_create(int key, int value) {
+Node* node_create(int cnt[26], int value) {
     Node *n;
 
     n = (Node*)malloc(sizeof(Node));
 
-    n->key   = key_create(key);
+    n->key   = key_create(cnt);
     n->value = value_create(value);
     n->left  = NULL;
     n->right = NULL;
 
     return n;
+}
+
+void callback(Node *n) {
+    int i;
+    for(i = 0; i < 26; i++)
+        printf("%d ", n->key->cnt[i]);
+
+    printf("| %d\n", n->value->value);
 }
 
 /******************************************************************************/
@@ -94,9 +107,13 @@ void bst_insert(BST *b, Node *n) {
 }
 
 Node* _search(Node *n, Key *key) {
-    int cmp = key_cmp(key, n->key);
+    int cmp;
 
-    if(!n || cmp == 0)
+    if(!n)
+        return n;
+
+    cmp = key_cmp(key, n->key);
+    if(cmp == 0)
         return n;
     else if(cmp < 0)
         return _search(n->left, key);
@@ -115,7 +132,8 @@ void _traverse(Node *n, void (*callback)(Node *n)) {
     _traverse(n->right, callback);
 }
 
-void bst_traverse(BST *b, void (*callback)(Node *n)) {
+
+void bst_traverse(BST *b) {
     _traverse(b->root, callback);
 }
 
@@ -138,27 +156,31 @@ void bst_free(BST *b) {
 /******************************************************************************/
 /*                                   Testing                                  */
 /******************************************************************************/
-void f(Node *n) {
-    printf("(%d, %d) ", n->key->key, n->value->value);
-}
-
-int main(int argc, char const *argv[]) {
-    BST *b;
-
-    b = bst_create();
-    bst_insert(b, node_create(5, 1));
-    bst_insert(b, node_create(1, 2));
-    bst_insert(b, node_create(4, 3));
-    bst_insert(b, node_create(8, 4));
-    bst_insert(b, node_create(3, 5));
-    bst_insert(b, node_create(7, 6));
-    bst_insert(b, node_create(9, 7));
-    bst_insert(b, node_create(2, 8));
-    bst_insert(b, node_create(6, 9));
-
-    bst_traverse(b, &f);
-    printf("\n");
-
-    bst_free(b);
-    return 0;
-}
+// void f(Node *n) {
+//     int i;
+//     for(i = 0; i < 26; i++)
+//         printf("%d ", n->key->cnt[i]);
+//
+//     printf("| %d", n->value->value);
+// }
+//
+// int main(int argc, char const *argv[]) {
+//     BST *b;
+//
+//     b = bst_create();
+//     bst_insert(b, node_create(5, 1));
+//     bst_insert(b, node_create(1, 2));
+//     bst_insert(b, node_create(4, 3));
+//     bst_insert(b, node_create(8, 4));
+//     bst_insert(b, node_create(3, 5));
+//     bst_insert(b, node_create(7, 6));
+//     bst_insert(b, node_create(9, 7));
+//     bst_insert(b, node_create(2, 8));
+//     bst_insert(b, node_create(6, 9));
+//
+//     bst_traverse(b, &f);
+//     printf("\n");
+//
+//     bst_free(b);
+//     return 0;
+// }
