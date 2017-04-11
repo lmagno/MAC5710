@@ -44,7 +44,7 @@ int main(int argc, char const *argv[]) {
         }
 
         q = node_queue(n);
-        queue_push(q, l);
+        queue_push(q, s);
 
         if(!qmax)
             qmax = q;
