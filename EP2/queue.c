@@ -62,18 +62,12 @@ void queue_pop(Queue *q, char *s) {
 
 /* Print a representation of the queue 'q' to STDOUT*/
 void queue_print(Queue *q) {
+    int length = queue_length(q);
     QCell *c;
 
-    if (queue_length(q) == 0) {
-        printf("[]\n");
-        return;
-    }
+    printf("Queue (%d elements):\n", length);
 
-    c = q->first;
-    printf("[");
-    printf("%s", c->value);
-    for (c = c->next; c != NULL; c = c->next) printf(", %s", c->value);
-    printf("]");
+    for (c = q->first; c != NULL; c = c->next) printf("    %s\n", c->value);
     printf("\n");
 }
 

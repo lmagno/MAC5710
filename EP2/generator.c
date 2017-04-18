@@ -5,16 +5,18 @@ int main(int argc, char const *argv[]) {
     uint8_t letters[26];
     int i, j;
     char word[100];
-    // Queue *q;
+    Queue *q;
 
-    // q = queue_create();
     for(i = 0; i < 10; i++) {
+        q = queue_create();
         letters_random(letters, 10);
         letters_print(letters);
         for(j = 0; j < 5; j++) {
             word_random(word, letters, 10);
-            printf("%s\n", word);
+            queue_push(q, word);
         }
+        queue_print(q);
+        queue_free(q);
     }
 
     return 0;
