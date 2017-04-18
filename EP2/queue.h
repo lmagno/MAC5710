@@ -13,15 +13,12 @@ struct _QCell {
     struct _QCell *next;
 };
 
-
 /* The header of the queue*/
 struct _Queue {
     int length;
     QCell *first;
     QCell *last;
 };
-
-
 
 Queue* queue_create();
 void   queue_push(Queue *q, char *s);
