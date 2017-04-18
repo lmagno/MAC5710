@@ -14,7 +14,7 @@ int main(int argc, char const *argv[]) {
     FILE *file;
     int8_t cnt[26];
     char s[MAX], l[MAX];
-    Node *n;
+    Node **n, *m;
     BST *b;
     Key *k;
     Queue *q, *qmax;
@@ -38,12 +38,15 @@ int main(int argc, char const *argv[]) {
         k = key_create(cnt);
         n = bst_search(b, k);
         free(k);
-        if(!n) {
-            n = node_create(cnt);
-            bst_insert(b, n);
+
+        if(!(*n)) {
+            m = node_create(cnt);
+            *n = m;
+        } else {
+            m = *n;
         }
 
-        q = node_queue(n);
+        q = node_get_queue(m);
         queue_push(q, s);
 
         if(!qmax)

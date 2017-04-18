@@ -88,7 +88,7 @@ void callback(Node *n) {
     queue_print(n->value->queue);
 }
 
-Queue* node_queue(Node *n) {
+Queue* node_get_queue(Node *n) {
     return n->value->queue;
 }
 /******************************************************************************/
@@ -124,22 +124,44 @@ void bst_insert(BST *b, Node *n) {
     b->root = _insert(b->root, n);
 }
 
-Node* _search(Node *n, Key *key) {
+Node** _search(Node **root, Key *key) {
     int cmp;
+    Node **m, *n = *root;
 
     if(!n)
-        return n;
+        return NULL;
 
     cmp = key_cmp(key, n->key);
+
     if(cmp == 0)
-        return n;
-    else if(cmp < 0)
-        return _search(n->left, key);
-    else
-        return _search(n->right, key);
+        return root;
+    else if(cmp < 0) {
+        m = _search(&(n->left), key);
+
+        if(!m)
+            return &(n->left);
+        else
+            return m;
+    } else
+        m = _search(&(n->right), key);
+
+        if(!m)
+            return &(n->right);
+        else
+            return m;
 }
-Node* bst_search(BST *b, Key *key) {
-    return _search(b->root, key);
+
+/* Searches the BST 'b' for the key 'key'.
+    If 'b' is empty, returns a pointer to the root.
+    If it's not empty, recursively searches for a node with
+    the same key, starting with the root. If it finds it,
+    a pointer to this node is returned, otherwise a pointer
+    to where it should be is returned.*/
+Node** bst_search(BST *b, Key *key) {
+    if(!(b->root))
+        return &(b->root);
+    else
+        return _search(&(b->root), key);
 }
 
 void _traverse(Node *n, void (*callback)(Node *n)) {
@@ -159,6 +181,8 @@ void bst_free(BST *b) {
     node_free(b->root);
     free(b);
 }
+
+
 
 /******************************************************************************/
 /*                                   Testing                                  */
