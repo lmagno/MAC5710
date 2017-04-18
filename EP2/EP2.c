@@ -8,18 +8,21 @@
 #define MAX 100
 
 char* lower(char *l, char *s);
-void count(int8_t *cnt, char *l);
+void count(int8_t *letters, char *l);
 
 int main(int argc, char const *argv[]) {
     FILE *file;
-    int8_t cnt[26];
+    int8_t letters[26];
     char s[MAX], l[MAX];
     Node **n, *m;
     BST *b;
     Key *k;
     Queue *q, *qmax;
 
+    /* Create an empty BST */
     b = bst_create();
+
+    /* Open input file */
     file = fopen(argv[1], "r");
 
     if(!file) {
@@ -27,55 +30,69 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    /* Pointer to hold the node with the longest queue */
     qmax = NULL;
     while(1) {
         q = NULL;
-        fscanf(file, "%s", s);
-        // printf("%s\n", s);
-        lower(l, s);
-        count(cnt, l);
 
-        k = key_create(cnt);
+        /* Read a word, lower it and count its letters */
+        fscanf(file, "%s", s);
+        lower(l, s);
+        count(letters, l);
+
+        /* Create a temporary key from the letters and look for it in the BST */
+        k = key_create(letters);
         n = bst_search(b, k);
         free(k);
 
+        /* If the key isn't on the BST, create a new node with
+        this key and insert it */
         if(!(*n)) {
-            m = node_create(cnt);
+            m = node_create(letters);
             *n = m;
         } else {
             m = *n;
         }
 
+        /* Add the original word 's' to the queue associated
+        with the current key */
         q = node_get_queue(m);
         queue_push(q, s);
 
+        /* Update qmax */
         if(!qmax)
             qmax = q;
         else if(q->length > qmax->length)
             qmax = q;
 
+        /* Break loop if at the end of the file */
         if(feof(file)) break;
     }
-    // bst_traverse(b);
+
+    /* Present results */
     printf("Biggest set of anagrams (length = %d):\n", qmax->length);
     queue_print(qmax);
 
+    /* Free allocations */
     bst_free(b);
     fclose(file);
     return 0;
 }
 
-void count(int8_t *cnt, char *l) {
+/* Count the ocurrences of each letter in the lowered word 'l',
+storing the values in the array 'letters' */
+void count(int8_t *letters, char *l) {
     int i, n = strlen(l);
     int a = 'a' - 'a';
     int z = 'z' - 'a';
     char c;
 
-    for(i = a; i <= z; i++) cnt[i] = 0;
+    for(i = a; i <= z; i++)
+        letters[i] = 0;
 
     for(i = 0; i < n; i++) {
         c = l[i];
-        cnt[c - 'a'] += 1;
+        letters[c - 'a'] += 1;
     }
 
 }

@@ -11,7 +11,7 @@ void _traverse(Node *n, void (*callback)(Node *n));
 
 /* Structs for key and value of a node' */
 struct Key {
-    int8_t cnt[26];
+    int8_t letters[26];
 };
 
 struct Value {
@@ -19,14 +19,14 @@ struct Value {
 };
 
 /* Allocate a key */
-Key* key_create(int8_t cnt[26]) {
+Key* key_create(int8_t letters[26]) {
     int i;
     Key *k;
 
     k = (Key*)malloc(sizeof(Key));
 
     for(i = 0; i < 26; i++)
-        k->cnt[i] = cnt[i];
+        k->letters[i] = letters[i];
 
     return k;
 }
@@ -49,9 +49,9 @@ int key_cmp(Key *k1, Key *k2) {
     int i;
 
     for(i = 0; i < 26; i++) {
-        if(k1->cnt[i] < k2->cnt[i])
+        if(k1->letters[i] < k2->letters[i])
             return -1;
-        else if(k1->cnt[i] > k2->cnt[i])
+        else if(k1->letters[i] > k2->letters[i])
             return 1;
     }
 
@@ -67,12 +67,12 @@ struct Node {
 };
 
 /* Allocate a node */
-Node* node_create(int8_t cnt[26]) {
+Node* node_create(int8_t letters[26]) {
     Node *n;
 
     n = (Node*)malloc(sizeof(Node));
 
-    n->key   = key_create(cnt);
+    n->key   = key_create(letters);
     n->value = value_create();
     n->left  = NULL;
     n->right = NULL;
@@ -87,7 +87,7 @@ void node_free(Node *n) {
     node_free(n->left);
     node_free(n->right);
 
-    // free(n->key->cnt);
+    // free(n->key->letters);
     free(n->key);
     queue_free(n->value->queue);
     free(n->value);
@@ -98,7 +98,7 @@ void node_free(Node *n) {
 void callback(Node *n) {
     int i;
     for(i = 0; i < 26; i++)
-        printf("%d ", n->key->cnt[i]);
+        printf("%d ", n->key->letters[i]);
 
     printf("| ");
     queue_print(n->value->queue);
