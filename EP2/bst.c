@@ -11,7 +11,7 @@ void _traverse(Node *n, void (*callback)(Node *n));
 
 /* Structs for key and value of a node' */
 struct Key {
-    int8_t letters[26];
+    uint8_t letters[26];
 };
 
 struct Value {
@@ -19,7 +19,7 @@ struct Value {
 };
 
 /* Allocate a key */
-Key* key_create(int8_t letters[26]) {
+Key* key_create(uint8_t letters[26]) {
     int i;
     Key *k;
 
@@ -67,7 +67,7 @@ struct Node {
 };
 
 /* Allocate a node */
-Node* node_create(int8_t letters[26]) {
+Node* node_create(uint8_t letters[26]) {
     Node *n;
 
     n = (Node*)malloc(sizeof(Node));
@@ -87,7 +87,6 @@ void node_free(Node *n) {
     node_free(n->left);
     node_free(n->right);
 
-    // free(n->key->letters);
     free(n->key);
     queue_free(n->value->queue);
     free(n->value);

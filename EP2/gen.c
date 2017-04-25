@@ -5,8 +5,6 @@ int main(int argc, char const *argv[]) {
     Queue *q;
     uint8_t letters[26];
     int i, n, m;
-    // char word[100];
-    // bool unique;
 
     n = atoi(argv[1]);
     m = atoi(argv[2]);
@@ -95,9 +93,9 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
 
         /* Restore 'part' so that 'part == letters' */
         part[i] += 1;
+        queue_free(Q);
     }
 
-    queue_free(Q);
     return P;
 }
 
@@ -170,9 +168,10 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
 
         /* Restore 'part' so that 'part == letters' */
         part[i] += 1;
+        
+        queue_free(Q);
     }
 
-    queue_free(Q);
     return P;
 }
 
