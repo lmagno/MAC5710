@@ -1,4 +1,4 @@
-#include "generator.h"
+#include "gen.h"
 
 
 int main(int argc, char const *argv[]) {
