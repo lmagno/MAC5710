@@ -8,11 +8,12 @@
 #define MAX 100
 
 char* lower(char *l, char *s);
-void count(int8_t *letters, char *l);
+void count(uint8_t *letters, char *l);
 
 int main(int argc, char const *argv[]) {
+    int r;
     FILE *file;
-    int8_t letters[26];
+    uint8_t letters[26];
     char s[MAX], l[MAX];
     Node **n, *m;
     BST *b;
@@ -36,7 +37,11 @@ int main(int argc, char const *argv[]) {
         q = NULL;
 
         /* Read a word, lower it and count its letters */
-        fscanf(file, "%s", s);
+        r = fscanf(file, "%s", s);
+        if(r != 1) {
+            fprintf(stderr, "Couldn't read from file %s\n", argv[1]);
+            exit(EXIT_FAILURE);
+        }
         lower(l, s);
         count(letters, l);
 
@@ -81,7 +86,7 @@ int main(int argc, char const *argv[]) {
 
 /* Count the ocurrences of each letter in the lowered word 'l',
 storing the values in the array 'letters' */
-void count(int8_t *letters, char *l) {
+void count(uint8_t *letters, char *l) {
     int i, n = strlen(l);
     int a = 'a' - 'a';
     int z = 'z' - 'a';
