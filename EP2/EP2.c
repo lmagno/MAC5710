@@ -1,3 +1,13 @@
+/*****************************************************/
+/* Nome: Lucas Magno                                 */
+/* Número USP: 7994983                               */
+/* Exercício-Programa 2                              */
+/*                                                   */
+/* Executar o programa da forma:                     */
+/*     $ ./EP2 dicionario.txt                        */
+/*                                                   */
+/* Resultados são impressos na stdout.               */
+/*****************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

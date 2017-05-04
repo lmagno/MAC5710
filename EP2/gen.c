@@ -1,3 +1,18 @@
+/****************************************************************/
+/* Nome: Lucas Magno                                            */
+/* Número USP: 7994983                                          */
+/* Exercício-Programa 2                                         */
+/*                                                              */
+/* Executar o programa da forma:                                */
+/*     $ ./gen wordlen setlen dictlen output.txt                */
+/* onde                                                         */
+/*     wordlen: tamanho máximo das palavras                     */
+/*      setlen: tamanho do maior conjunto de anagramas          */
+/*     dictlen: número de palavras no dicionário                */
+/*  output.txt: arquivo de saída onde será gravado o dicionário */
+/*                                                              */
+/* Resultados são impressos na stdout.                          */
+/****************************************************************/
 #include "gen.h"
 #include "bst.h"
 #include <time.h>
@@ -7,43 +22,47 @@ int main(int argc, char const *argv[]) {
     char s[100];
     Queue *q, *qmax;
     uint8_t letters[26];
-    int n, m, word, max, total, len;
+    int m, left, len;
+    int wordlen, setlen, dictlen;
     Node *node, **pnode;
     Key *k;
     FILE *file;
 
-    /* No buffer for output */
-    setbuf(stdout, NULL);
+    /* Check number of arguments */
+    if(argc != 5) {
+        fprintf(stderr, "ERROR: Wrong number of arguments. Expected %d, got %d.\n", 4, argc-1);
+        exit(EXIT_FAILURE);
+    }
 
     /* Open output file */
-    file = fopen(argv[1], "w");
+    file = fopen(argv[4], "w");
     if(!file) {
         fprintf(stderr, "ERROR: Couldn't open file %s for writing.\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
-    word = 20;
-    max = 20;
-    n = 100;
+    wordlen = atoi(argv[1]);
+     setlen = atoi(argv[2]);
+    dictlen = atoi(argv[3]);
     srand(time(NULL));
 
     /* Use BST so we don't generate the same set of anagrams more than once */
     b = bst_create();
 
     /* Create a random set of anagrams which will be the biggest */
-    letters_random(letters, word);
+    letters_random(letters, wordlen);
 
     node = node_create(letters);
     bst_insert(b, node);
 
     qmax = node_get_queue(node);
-    qmax = npermutations(letters, word, word, max);
-    max = queue_length(qmax);
+    qmax = npermutations(letters, wordlen, wordlen, setlen);
+    setlen = queue_length(qmax);
 
 
     /* Print it to stdout */
     printf("Biggest set of anagrams:\n");
-    total = max;
+    left = dictlen - setlen;
     queue_print(qmax);
 
     /* Print it to the output file */
@@ -54,9 +73,9 @@ int main(int argc, char const *argv[]) {
 
     queue_free(qmax);
 
-    /* Generate anagrams until 'n' is reached */
-    while(total < n) {
-        len = 1 + rand()%word;
+    /* Generate anagrams while there are still words left to fill the dictionary */
+    while(left > 0) {
+        len = 1 + rand()%wordlen;
         letters_random(letters, len);
 
         /* Create a temporary key from the letters and look for it in the BST */
@@ -76,11 +95,11 @@ int main(int argc, char const *argv[]) {
         q = node_get_queue(node);
 
         /* Get a random size 'm' for the next set of anagrams (1 ≤ m < max) */
-        m = min(n - total, 1 + rand()%(max-1));
+        m = min(left, 1 + rand()%(setlen-1));
 
         /* Get at most 'm' permutations of 'letters' in lexicographical order */
         q = npermutations(letters, len, len, m);
-        total += queue_length(q);
+        left -= queue_length(q);
 
         /* Write them to the output file */
         while(queue_length(q) > 0) {
