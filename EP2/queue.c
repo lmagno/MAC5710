@@ -16,7 +16,7 @@ Queue* queue_create() {
     return q;
 }
 
-/* Push a value 'i' into the queue 'q'*/
+/* Push a value 's' into the queue 'q'*/
 void queue_push(Queue *q, char *s) {
     QCell *c;
 

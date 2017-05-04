@@ -25,7 +25,7 @@ int main(int argc, char const *argv[]) {
     word = 20;
     max = 20;
     n = 100;
-    srand(time(NULL));
+    srand(1);
 
     b = bst_create();
 
@@ -49,6 +49,7 @@ int main(int argc, char const *argv[]) {
         fprintf(file, "%s\n", s);
     }
 
+    queue_free(qmax);
     while(total < n) {
         len = 1 + rand()%word;
         letters_random(letters, len);
@@ -80,6 +81,8 @@ int main(int argc, char const *argv[]) {
             queue_pop(q, s);
             fprintf(file, "%s\n", s);
         }
+
+        queue_free(q);
     }
 
     fclose(file);
@@ -121,6 +124,7 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
 
         /* Put the word in the queue and return it */
         queue_push(P, s);
+        free(s);
         return P;
     }
 
@@ -146,6 +150,7 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
             /* Concatenation (write at appropriate position) */
             s[wordlen-partlen] = 'a' + i;
             queue_push(P, s);
+            free(s);
         }
 
         /* Restore 'part' so that 'part == letters' */
@@ -187,6 +192,7 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
 
         /* Put the word in the queue and return it */
         queue_push(P, s);
+        free(s);
         return P;
     }
 
@@ -214,6 +220,7 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
             /* Concatenation (write at appropriate position) */
             s[wordlen-partlen] = 'a' + i;
             queue_push(P, s);
+            free(s);
 
             /* Stop if we already have enough permutations */
             if(++np == n) {
