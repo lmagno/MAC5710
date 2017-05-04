@@ -8,6 +8,7 @@
 #include <string.h>
 #include "queue.h"
 
+int min(int a, int b);
 void letters_random(uint8_t letters[26], int length);
 void letters_print(uint8_t letters[26]);
 void word_random(char *word, uint8_t letters[26], int length);

@@ -27,7 +27,7 @@ int main(int argc, char const *argv[]) {
     file = fopen(argv[1], "r");
 
     if(!file) {
-        fprintf(stderr, "Couldn't open file %s.\n", argv[1]);
+        fprintf(stderr, "ERROR: Couldn't open file %s.\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
@@ -38,8 +38,8 @@ int main(int argc, char const *argv[]) {
 
         /* Read a word, lower it and count its letters */
         r = fscanf(file, "%s", s);
-        if(r != 1) {
-            fprintf(stderr, "Couldn't read from file %s\n", argv[1]);
+        if(ferror(file)) {
+            fprintf(stderr, "ERROR: Couldn't read from file %s, fscanf returned %d.\n", argv[1], r);
             exit(EXIT_FAILURE);
         }
         lower(l, s);

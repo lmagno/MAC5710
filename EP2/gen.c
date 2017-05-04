@@ -1,36 +1,93 @@
 #include "gen.h"
-
+#include "bst.h"
+#include <time.h>
 
 int main(int argc, char const *argv[]) {
-    Queue *q;
+    BST *b;
+    char s[100];
+    Queue *q, *qmax;
     uint8_t letters[26];
-    int i, n, m;
+    int n, m, word, max, total, len;
+    Node *node, **pnode;
+    Key *k;
+    FILE *file;
 
-    n = atoi(argv[1]);
-    m = atoi(argv[2]);
-    srand(1);
-    for(i = 0; i < 10; i++) {
-        q = queue_create();
-        letters_random(letters, n);
-        letters_print(letters);
-        /*for(j = 0; j < 1; j++) {
-            do {
-                word_random(word, letters, 10);
-                unique = true;
-                for(k = 0; k < j; k++)
-                    unique && !strcmp(word, anagrams[k]);
-            } while(!unique);
-            strcpy(anagrams[j], word);
-            queue_push(q, word);
-        }*/
+    /* No buffer for output */
+    /*setbuf(stdout, NULL);*/
 
-        q = npermutations(letters, n, n, m);
-        queue_print(q);
-        printf("%d\n", queue_length(q));
-        queue_free(q);
+    /* Open output file */
+    file = fopen(argv[1], "w");
+    if(!file) {
+        fprintf(stderr, "ERROR: Couldn't open file %s for writing.\n", argv[1]);
+        exit(EXIT_FAILURE);
     }
 
+    word = 20;
+    max = 20;
+    n = 100;
+    srand(time(NULL));
+
+    b = bst_create();
+
+    /* Create a random set of anagrams which will be the biggest */
+    letters_random(letters, word);
+
+    node = node_create(letters);
+    bst_insert(b, node);
+
+    qmax = node_get_queue(node);
+    qmax = npermutations(letters, word, word, max);
+    max = queue_length(qmax);
+
+
+    printf("Biggest set of anagrams:\n");
+    total = max;
+    queue_print(qmax);
+
+    while(queue_length(qmax) > 0) {
+        queue_pop(qmax, s);
+        fprintf(file, "%s\n", s);
+    }
+
+    while(total < n) {
+        len = 1 + rand()%word;
+        letters_random(letters, len);
+
+        /* Create a temporary key from the letters and look for it in the BST */
+        k = key_create(letters);
+        pnode = bst_search(b, k);
+        free(k);
+
+        /* If the key is already on the BST, try again */
+        if(*pnode != NULL)
+            continue;
+
+        /* If the key isn't on the BST, create a new node with
+        this key and insert it */
+        node = node_create(letters);
+        *pnode = node;
+
+        q = node_get_queue(node);
+
+        do {
+            m = min(n - total,rand()%max);
+        } while (m == 0);
+
+        q = npermutations(letters, len, len, m);
+        total += queue_length(q);
+
+        while(queue_length(q) > 0) {
+            queue_pop(q, s);
+            fprintf(file, "%s\n", s);
+        }
+    }
+
+    fclose(file);
+    bst_free(b);
     return 0;
+}
+int min(int a, int b) {
+    return a < b ? a : b;
 }
 
 /* Generate all unique permutations of the letters indicated by 'letters'
@@ -168,7 +225,7 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
 
         /* Restore 'part' so that 'part == letters' */
         part[i] += 1;
-        
+
         queue_free(Q);
     }
 
