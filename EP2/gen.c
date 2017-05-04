@@ -13,7 +13,7 @@ int main(int argc, char const *argv[]) {
     FILE *file;
 
     /* No buffer for output */
-    /*setbuf(stdout, NULL);*/
+    setbuf(stdout, NULL);
 
     /* Open output file */
     file = fopen(argv[1], "w");
@@ -25,8 +25,9 @@ int main(int argc, char const *argv[]) {
     word = 20;
     max = 20;
     n = 100;
-    srand(1);
+    srand(time(NULL));
 
+    /* Use BST so we don't generate the same set of anagrams more than once */
     b = bst_create();
 
     /* Create a random set of anagrams which will be the biggest */
@@ -40,16 +41,20 @@ int main(int argc, char const *argv[]) {
     max = queue_length(qmax);
 
 
+    /* Print it to stdout */
     printf("Biggest set of anagrams:\n");
     total = max;
     queue_print(qmax);
 
+    /* Print it to the output file */
     while(queue_length(qmax) > 0) {
         queue_pop(qmax, s);
         fprintf(file, "%s\n", s);
     }
 
     queue_free(qmax);
+
+    /* Generate anagrams until 'n' is reached */
     while(total < n) {
         len = 1 + rand()%word;
         letters_random(letters, len);
@@ -70,13 +75,14 @@ int main(int argc, char const *argv[]) {
 
         q = node_get_queue(node);
 
-        do {
-            m = min(n - total,rand()%max);
-        } while (m == 0);
+        /* Get a random size 'm' for the next set of anagrams (1 ≤ m < max) */
+        m = min(n - total, 1 + rand()%(max-1));
 
+        /* Get at most 'm' permutations of 'letters' in lexicographical order */
         q = npermutations(letters, len, len, m);
         total += queue_length(q);
 
+        /* Write them to the output file */
         while(queue_length(q) > 0) {
             queue_pop(q, s);
             fprintf(file, "%s\n", s);
@@ -89,6 +95,8 @@ int main(int argc, char const *argv[]) {
     bst_free(b);
     return 0;
 }
+
+/* Simple function for the minimum of two integers */
 int min(int a, int b) {
     return a < b ? a : b;
 }
