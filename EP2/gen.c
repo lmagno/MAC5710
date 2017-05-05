@@ -128,13 +128,13 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
     uint8_t part[26];
     Queue *P, *Q;
 
+    s = (char*)malloc((wordlen+1)*sizeof(char));
+
     /* Allocate the queue that will hold the partial permutations */
     P = queue_create();
 
     /* Permutations of a single element is itself */
     if(partlen == 1) {
-        s = (char*)malloc((wordlen+1)*sizeof(char));
-
         /* Fill the string with noise so that we don't get its length wrong */
         for(i = 0; i < wordlen; i++)
             s[i] = '*';
@@ -151,7 +151,6 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
 
         /* Put the word in the queue and return it */
         queue_push(P, s);
-        free(s);
         return P;
     }
 
@@ -171,13 +170,11 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
         and itself */
         while(queue_length(Q) > 0) {
             /* Get a permutation */
-            s = (char*)malloc((wordlen+1)*sizeof(char));
             queue_pop(Q, s);
 
             /* Concatenation (write at appropriate position) */
             s[wordlen-partlen] = 'a' + i;
             queue_push(P, s);
-            free(s);
         }
 
         /* Restore 'part' so that 'part == letters' */
@@ -185,6 +182,7 @@ Queue* permutations(uint8_t letters[26], int wordlen, int partlen) {
         queue_free(Q);
     }
 
+    free(s);
     return P;
 }
 
@@ -196,13 +194,12 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
     uint8_t part[26];
     Queue *P, *Q;
 
+    s = (char*)malloc((wordlen+1)*sizeof(char));
     /* Allocate the queue that will hold the partial permutations */
     P = queue_create();
 
     /* Permutations of a single element is itself */
     if(partlen == 1) {
-        s = (char*)malloc((wordlen+1)*sizeof(char));
-
         /* Fill the string with noise so that we don't get its length wrong */
         for(i = 0; i < wordlen; i++)
             s[i] = '*';
@@ -219,7 +216,6 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
 
         /* Put the word in the queue and return it */
         queue_push(P, s);
-        free(s);
         return P;
     }
 
@@ -241,13 +237,11 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
         and itself */
         while(queue_length(Q) > 0) {
             /* Get a permutation */
-            s = (char*)malloc((wordlen+1)*sizeof(char));
             queue_pop(Q, s);
 
             /* Concatenation (write at appropriate position) */
             s[wordlen-partlen] = 'a' + i;
             queue_push(P, s);
-            free(s);
 
             /* Stop if we already have enough permutations */
             if(++np == n) {
@@ -263,6 +257,7 @@ Queue* npermutations(uint8_t letters[26], int wordlen, int partlen, int n) {
         queue_free(Q);
     }
 
+    free(s);
     return P;
 }
 
