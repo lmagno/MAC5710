@@ -5,3 +5,11 @@ EP1/EP1
 EP1/test
 EP2/EP2
 EP2/gen
+P1
+
+# LaTeX files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
