@@ -293,7 +293,7 @@
 
     A seguir são dados outros exemplos gerados, que foram executados num computador com a seguinte configuração (saída do programa \ttt{neofetch}):
     \begin{lstlisting}
-              eeeeeeeeeeeeeeeee            
+              eeeeeeeeeeeeeeeee
            eeeeeeeeeeeeeeeeeeeeeee         ----------------
          eeeee  eeeeeeeeeeee   eeeee       OS: elementary OS 0.4 Loki x86_64
        eeee   eeeee       eee     eeee     Model: Z97-D3H
@@ -454,4 +454,8 @@
 
         \end{lstlisting}
 
+\section{Conclusão}
+    Como visto pelos resultados, a saída de ambos programas coincidem, o que sugere que a implementação do \ttt{EP2} esteja correta e que a saída para o exemplo \ttt{dicionario.txt} também. Além disso, os tempos de execução estiveram dentro do esperado para o tamanho do problema, o que por sua vez sugere boa eficiência da implementação, embora seriam necessários mais testes (e em outros computadores) para se confirmar isso.
+
+    Uma complicação que poderia ocorrer é devido à árvore binária de busca utilizada, cuja implementação é a mais simples, então não há controle de altura e portanto poderíamos ter situações em que seu desempenho é linear, e não logarítmico como esperado. Isso não ocorreu nos testes pois os dicionários considerados têm as palavras em ordem aleatória (em relação à comparação entre chaves da árvore binária). Nos casos em que os dicionários estão ordenados pelas chaves, o ideal seria utilizar alguma árvore binária balanceada. 
 \end{document}
