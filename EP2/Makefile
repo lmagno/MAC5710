@@ -14,4 +14,11 @@ gen: gen.c gen.h $(HEADERS) $(SOURCES)
 	$(CC) $(CFLAGS) gen.c $(SOURCES) -o $@
 
 clean:
-	rm -rf EP2 gen libs/*.gch *.o
+	rm -rf EP2 gen \
+	*.aux \
+	*.fdb_latexmk \
+	*.fls \
+	*.log \
+	*.synctex.gz \
+	*.gch \
+	*.o
