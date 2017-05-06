@@ -94,7 +94,7 @@ int main(int argc, char const *argv[]) {
 
         q = node_get_queue(node);
 
-        /* Get a random size 'm' for the next set of anagrams (1 ≤ m < max) */
+        /* Get a random size 'm' for the next set of anagrams (1 ≤ m < setlen) */
         m = min(left, 1 + rand()%(setlen-1));
 
         /* Get at most 'm' permutations of 'letters' in lexicographical order */

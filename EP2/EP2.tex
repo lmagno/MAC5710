@@ -1,13 +1,15 @@
-\documentclass{article}
+\documentclass[a4paper]{article}
 
 \usepackage[T1]{fontenc}
 % \usepackage[utf8]{inputenc}
 \usepackage[brazilian]{babel}				% Brazilian portuguese language/hyphenation
 \usepackage{amsmath,amsfonts,amsthm,amssymb}% Math packages
 \usepackage{graphicx}						% Enable pdflatex
-% \usepackage{subcaption}						% Images side-by-side
 \usepackage{indentfirst}
 \usepackage{fullpage}
+\usepackage{listings}
+\usepackage[boxed]{algorithm2e}
+% \usepackage{subcaption}						% Images side-by-side
 % \usepackage{bm}
 % \usepackage{minted}
 % \usepackage{fontspec}
@@ -20,9 +22,436 @@
 % \usepackage{newfloat}
 % \usepackage{ifthen}
 
-\title{{\scshape\small MAC5710 - Estruturas de Dados e sua Manipulação} \\ EP2}
+\newcommand{\ttt}{\texttt}
+\SetKwInput{Entrada}{Entrada}
+\SetKwInput{Saida}{Saída}
+\SetKwInput{Dados}{Dados}
+\SetKwInput{Resultado}{Resultado}
+\SetKw{Ate}{até} \SetKw{KwRetorna}{retorna}
+\SetKw{Retorna}{retorna}
+\SetKw{Continua}{continua}
+\SetKwBlock{Inicio}{início}{fim}
+\SetKwIF{Se}{SenaoSe}{Senao}{se}{então}{senão se}{senão}{fim se}
+% \SetKwSwitch{Selec}{Caso}{Outro}{selecione}{faça}{caso}{senão}{fim caso}fim selec
+\SetKwFor{Para}{para}{faça}{fim para}
+\SetKwFor{ParaPar}{para}{faça em paralelo}{fim para}
+\SetKwFor{ParaCada}{para cada}{faça}{fim para cada}
+\SetKwFor{ParaTodo}{para todo}{faça}{fim para todo}
+\SetKwFor{Enqto}{enquanto}{faça}{fim enqto}
+\SetKwRepeat{Repita}{repita}{até}
+
+\title{{\scshape\small MAC5710 - Estruturas de Dados e sua Manipulação} \\ Exercício-Programa 2}
 \author{Lucas Magno \\ 7994983}
 \date{}
+
 \begin{document}
-    \maketitle
+\maketitle
+
+\section{Introdução}
+    Este trabalho consiste em, a partir de um \emph{dicionário}, um arquivo com sequência de palavras, determinar um maior conjunto de anagramas dentre tais palavras. Um dicionário tem a forma:
+
+    \begin{lstlisting}[captionpos=b,caption={Exemplo de dicionário},escapeinside={\%*}{*)}]
+        A
+        a
+        aa
+        aal
+        aalii
+        aam
+        Aani
+        aardvark
+        aardwolf
+        Aaron
+        %*\vdots *)
+        zymotoxic
+        zymurgy
+        Zyrenian
+        Zyrian
+        Zyryan
+        zythem
+        Zythia
+        zythum
+        Zyzomys
+        Zyzzogeton
+    \end{lstlisting}
+    Para tal foi desenvolvido um programa em C, cujos detalhes serão discutidos a seguir. Também foi implementado um gerador de dicionários, a fim de testar o programa, discutido mais adiante.
+
+\newpage
+\section{Algoritmo}
+    O algoritmo para encontrar um maior conjunto de anagramas consiste em, para cada string de um dado dicionário, calcular uma \emph{hash} (tal que todos os anagramas de uma palavra têm a mesma \emph{hash}) e colocar a string na fila do nó correspondente a tal \emph{hash} em uma árvore binária de busca. Ao longo do processo, basta manter um registro de uma maior fila encontrada até então e ao final teremos uma maior fila, um maior conjunto de anagramas, do dicionário.
+
+    Devido à nececessidade de se verificar um grande número de strings contra determinadas chaves (\emph{hashes}), algoritmo faz uso de uma árvore binária de busca $B$, que permite tal busca em tempo logarítmico, cujas chaves e valores de cada nó são
+    \begin{description}
+        \leftskip=2em
+        \item[Chave:] um vetor \texttt{letters} de 26 inteiros, onde cada elemento representa a contagem de uma determinada letra em uma palavra.\\
+            \texttt{letters[0]} é o número de vezes que a letra $a$ aparece,\\
+            \vdots\\
+            \texttt{letters[25]} é o número de vezes que a letra $z$ aparece.
+
+        \item[Valor:] uma fila de strings, tais que todas têm a mesma contagem de letras que a chave.
+    \end{description}
+
+    Onde a comparação entre duas chaves $l_1$ e $l_2$ é feita da seguinte forma:
+    \begin{align*}
+        \begin{cases}
+            l_1 = l_2,\quad &\text{se}\ l_1[i] = l_2[i],\text{ para todo } i = 0,\dots, 25\\
+            l_1 < l_2,\quad &\text{se}\ l_1[j] = l_2[j],\ j = 0, \dots, i-1\\
+                            &\text{ e } l_1[i] < l_2[i] \text{ para algum } i = 0,\dots,25\\
+            l_1 > l_2,\quad &\text{se}\ l_1[j] = l_2[j],\ j = 0, \dots, i-1\\
+                            &\text{ e } l_1[i] > l_2[i] \text{ para algum } i = 0,\dots,25\\
+        \end{cases}
+    \end{align*}
+
+    Assim, ao irmos adicionando as strings lidas do dicionário $D$ às filas de cada chave correspondente, garantimos que cada uma dessas filas é um conjunto de anagramas, pois contém strings com exatamente as mesmas letras. Portanto, após ler todo o dicionário, uma fila com maior tamanho é um maior conjunto de anagramas em $D$. A seguir o pseudocódigo do programa implementado.
+
+    \begin{algorithm}[h]
+        \SetKwData{B}{$B$}\SetKwData{D}{$D$}
+        \SetKwFunction{Length}{length}
+        \Entrada{\D dicionário}
+        \Saida{Fila com as strings que pertencem a um maior conjunto de anagramas em \D}
+        \BlankLine
+
+        \B $\leftarrow$ árvore binária de busca vazia\;
+        $qmax \leftarrow NULL$\;
+        \Enqto{não chegou ao final de \D}{
+            ler uma string $s$ de \D\;
+            $ls \leftarrow$ a forma \emph{lowered} de $s$\tcp*{letras minúsculas}
+            $letters \leftarrow$ um vetor com a contagem das letras em $ls$\;
+            % \tcp{letters[0] é a quantidade de vezes que a letra $a$ aparece em $ls$}
+            \BlankLine
+            \eSe{$letters$ está em $B$}{
+                adiciona $s$ à fila correspondente a esta chave\;
+            }{
+                cria um nó correspondente a esta chave em $B$ e coloca $s$ na nova fila\;
+            }
+            $q \leftarrow$ a fila correspondente a $letters$ em $B$\;
+            \Se{\Length{q} > \Length{qmax}}{
+                $qmax \leftarrow q$\;
+            }
+
+        }
+
+        \Retorna{qmax}\;
+        \caption{Busca por um maior conjunto de anagramas em um dicionário.}
+    \end{algorithm}
+
+\newpage
+\section{Gerador}
+    Para testar o programa, também foi implementado um gerador de dicionários, baseado na função \texttt{npermutations}, que gera as $n$ primeiras (ou todas, se não existirem mais que $n$) permutações únicas em ordem lexicográfica de um conjunto de letras, determinado por uma sequência \texttt{letters} de letras.\footnote{A implementação é um pouco diferente, utilizando um vetor \texttt{letters} de contagem como definido anteriormente e mais argumentos, por questões de eficiência, mas a lógica é a mesma.}
+
+    A função funciona recursivamente, gerando permutações únicas de subsequências de \texttt{letters} e as concatenando com cada letra única restante, como descrito no algoritmo a seguir.
+
+    \begin{algorithm}[h]
+        \SetKwFunction{Length}{length}
+        \SetKwFunction{Enfileira}{enfileira}
+        \SetKwFunction{Desenfileira}{desenfileira}
+        \SetKwFunction{npermutations}{npermutations}
+        \Entrada{
+            \begin{description}
+                \leftskip=2em % Indentation
+                \item[letters] uma sequência de letras;
+                \item[n] um inteiro.
+            \end{description}
+        }
+        \Saida{As $n$ primeiras permutações únicas de $letters$ em ordem lexicográfica.}
+        \BlankLine
+
+        $P \leftarrow$ uma fila de strings vazia\;
+        \BlankLine
+        \Se{\Length{letters} = 1}{
+            $s \leftarrow$ a única letra em $letters$\;
+            \Enfileira{$P$, $s$}\;
+            \Retorna $P$\;
+        }
+        \BlankLine
+        \ParaCada{letra única c em letters em ordem alfabética}{
+            $Q \leftarrow \npermutations{letters - c,n}$\tcp*{remove uma instância de $c$ em $letters$}
+            \Enqto{\Length{Q} > 0}{
+                $s \leftarrow \Desenfileira{Q}$\;
+                \Enfileira{P, c$\cdot$s}\tcp*{concatenação}
+                \BlankLine
+                \Se{\Length{P} = n}{
+                    \Retorna{P}\;
+                }
+
+            }
+        }
+        \BlankLine
+        \Retorna{P}\;
+        \caption{Função \texttt{npermutations}.}
+    \end{algorithm}
+
+    A partir desta função podemos construir de fato o gerador de dicionários, que consiste em:
+    \begin{enumerate}
+        \item Gerar uma contagem de letras \ttt{letters} aleatória com um dado tamanho máximo \ttt{wordlen};
+        \item Calcular um dado número \ttt{setlen} de permutações dessas letras e salvar como o maior conjunto de anagramas \ttt{qmax};
+        \item Inserir \ttt{qmax} em uma árvore binária de busca \ttt{B} com a chave \ttt{letters};
+        \item Enquanto ainda precisarmos gerar mais palavras sortear outra contagem de letras \ttt{letters} e, se esta não está em \ttt{B}, calcular um número menor que \ttt{setlen} de permutações e as salvar em \ttt{B} com a chave \ttt{letters}.
+    \end{enumerate}
+
+    A seguir é dado o algoritmo mais detalhadamente.
+
+    \newpage
+    \begin{algorithm}[h]
+        \SetKwFunction{Min}{min}
+        \SetKwFunction{Rand}{rand}
+        \SetKwFunction{Imprime}{imprime}
+        \SetKwFunction{Insere}{insere}
+        \SetKwFunction{LettersRandom}{lettersrandom}
+        \SetKwFunction{Length}{length}
+        \SetKwFunction{Enfileira}{enfileira}
+        \SetKwFunction{Desenfileira}{desenfileira}
+        \SetKwFunction{npermutations}{npermutations}
+        \Entrada{
+            \begin{description}
+                \leftskip=2em % Indentation
+                \item[wordlen] o tamanho máximo das palavras;
+                \item[setlen] o tamanho máximo dos conjuntos de anagramas;
+                \item[dictlen] o número de palavras no dicionário;
+                \item[file] o nome arquivo de saída.
+            \end{description}
+        }
+        \Saida{Um dicionário com $dictlen$ palavras de tamanho máximo $wordlen$, cujo único maior conjunto de anagramas $qmax$ tem tamanho no máximo $setlen$, escrito no arquivo de saída $file$. Além disso, imprime $qmax$ para a \texttt{STDOUT}.}
+        \BlankLine
+
+        $B \leftarrow $ uma árvore binária de busca vazia\;
+        $letters \leftarrow \LettersRandom{wordlen}$\;
+        $qmax \leftarrow$ \npermutations{letters, setlen}\;
+        $B[letters] \leftarrow qmax$\tcp*{insere $qmax$ em $B$ com chave $letters$}
+        $setlen \leftarrow \Length{qmax}$\tcp*{o conjunto gerado pode ser menor que $setlen$}
+        \BlankLine
+
+        \Imprime{qmax}\;
+        \Enqto{\Length{qmax} > 0}{
+            $s \leftarrow \Desenfileira{qmax}$\;
+            \Imprime{file, s}\;
+        }
+        \BlankLine
+
+        $restantes \leftarrow dictlen - setlen$\tcp*{número de palavras que ainda temos que gerar}
+        \Enqto{restantes > 0}{
+            $len \leftarrow$ \Rand{$[1, wordlen]$}\tcp*{número aleatório no intervalo $[1, wordlen]$}
+            $letters \leftarrow \LettersRandom{len}$\;
+
+            \Se{letters está em B}{\Continua\;}
+            \BlankLine
+
+            $m \leftarrow $ \Rand{$[1,\Min{restantes, setlen-1}]$}\;
+            $q \leftarrow$ \npermutations{letters, m}\;
+            $B[letters] \leftarrow q$\;
+            \BlankLine
+
+            \Enqto{\Length{q} > 0}{
+                $s \leftarrow$ \Desenfileira{q}\;
+                \Imprime{file, s}\;
+            }
+            $restantes \leftarrow restantes - \Length{q}$\;
+        }
+        \caption{Gerador de dicionários.}
+    \end{algorithm}
+
+    Onde \ttt{lettersrandom(n)} é uma função que retorna uma contagem aleatória de letras com tamanho $n$.
+
+\newpage
+\section{Compilação e Uso}
+    Para compilar os programas, basta executar os seguintes comandos:
+    \begin{description}\leftskip=3em
+        \item[Programa:] \ttt{make}
+        \item[Gerador:] \ttt{make gen}
+    \end{description}
+    que criam os executáveis \ttt{EP2} e \ttt{gen}, respectivamente.
+
+    O programa \ttt{EP2} deve ser invocado da forma
+    \begin{lstlisting}
+        ./EP2 dicionario.txt
+    \end{lstlisting}
+    e o resultado é mostrado na tela.
+
+    Já o gerador é invocado na forma
+    \begin{lstlisting}
+        ./gen wordlen setlen dictlen output.txt
+    \end{lstlisting}
+    onde \ttt{wordlen}, \ttt{setlen} e \ttt{dictlen} são inteiros positivos como definido anteriormente e \ttt{output.txt} é o arquivo de saída onde será gravado o dicionário. O programa então imprime para a tela o maior conjunto de anagramas gerado.
+
+\section{Resultados}
+    Para o dicionário \ttt{dicionario.txt} fornecido como exemplo, obtemos a seguinte saída
+    \begin{lstlisting}
+        Biggest set of anagrams:
+        Queue (11 elements):
+            angor
+            argon
+            goran
+            grano
+            groan
+            nagor
+            Orang
+            orang
+            organ
+            rogan
+            Ronga
+    \end{lstlisting}
+    e cuja execução levou $0.27\,s$.
+
+    A seguir são dados outros exemplos gerados, que foram executados num computador com a seguinte configuração (saída do programa \ttt{neofetch}):
+    \begin{lstlisting}
+              eeeeeeeeeeeeeeeee            
+           eeeeeeeeeeeeeeeeeeeeeee         ----------------
+         eeeee  eeeeeeeeeeee   eeeee       OS: elementary OS 0.4 Loki x86_64
+       eeee   eeeee       eee     eeee     Model: Z97-D3H
+      eeee   eeee          eee     eeee    Kernel: 4.4.0-77-generic
+     eee    eee            eee       eee   Uptime: 14 hours, 21 mins
+     eee   eee            eee        eee   Packages: 2300
+     ee    eee           eeee       eeee   Shell: fish 2.2.0
+     ee    eee         eeeee      eeeeee   Resolution: 1920x1080
+     ee    eee       eeeee      eeeee ee   DE: Pantheon
+     eee   eeee   eeeeee      eeeee  eee   WM: Mutter(Gala)
+     eee    eeeeeeeeee     eeeeee    eee   Theme: Arc [GTK2/3]
+      eeeeeeeeeeeeeeeeeeeeeeee    eeeee    Icons: Paper [GTK2/3]
+       eeeeeeee eeeeeeeeeeee      eeee     Terminal: mc
+         eeeee                 eeeee       CPU: Intel i5-4690K (4) @ 3.900GHz
+           eeeeeee         eeeeeee         GPU: NVIDIA GeForce GTX 750
+              eeeeeeeeeeeeeeeee            Memory: 4915MiB / 15925MiB
+    \end{lstlisting}
+
+    \newpage
+    \subsection{\tt ./gen 4 10 100000 output.txt}
+        Tempos de execução:
+        \begin{align*}
+            \ttt{gen:}\quad &0.10\, s\\
+            \ttt{EP2:}\quad &0.04\, s
+        \end{align*}
+
+        Saída de \ttt{gen}:
+        \begin{lstlisting}
+            Biggest set of anagrams:
+            Queue (10 elements):
+                dhsy
+                dhys
+                dshy
+                dsyh
+                dyhs
+                dysh
+                hdsy
+                hdys
+                hsdy
+                hsyd
+        \end{lstlisting}
+
+        Saída de \ttt{EP2}:
+        \begin{lstlisting}
+            Biggest set of anagrams:
+            Queue (10 elements):
+                dhsy
+                dhys
+                dshy
+                dsyh
+                dyhs
+                dysh
+                hdsy
+                hdys
+                hsdy
+                hsyd
+        \end{lstlisting}
+
+    \newpage
+    \subsection{\tt ./gen 8 10 1000000 output.txt}
+        Tempos de execução:
+        \begin{align*}
+            \ttt{gen:}\quad &0.97\, s\\
+            \ttt{EP2:}\quad &0.63\, s
+        \end{align*}
+
+        Saída de \ttt{gen}:
+        \begin{lstlisting}
+            Biggest set of anagrams:
+            Queue (10 elements):
+                aijlpuvz
+                aijlpuzv
+                aijlpvuz
+                aijlpvzu
+                aijlpzuv
+                aijlpzvu
+                aijlupvz
+                aijlupzv
+                aijluvpz
+                aijluvzp
+        \end{lstlisting}
+
+        Saída de \ttt{EP2}:
+        \begin{lstlisting}
+            Biggest set of anagrams:
+            Queue (10 elements):
+                aijlpuvz
+                aijlpuzv
+                aijlpvuz
+                aijlpvzu
+                aijlpzuv
+                aijlpzvu
+                aijlupvz
+                aijlupzv
+                aijluvpz
+                aijluvzp
+        \end{lstlisting}
+
+    \newpage
+    \subsection{\tt ./gen 20 20 1000000 output.txt}
+        Tempos de execução:
+        \begin{align*}
+            \ttt{gen:}\quad &0.98\, s\\
+            \ttt{EP2:}\quad &0.44\, s
+        \end{align*}
+
+        Saída de \ttt{gen}:
+        \begin{lstlisting}
+            Biggest set of anagrams:
+            Queue (20 elements):
+                defggijjklmmorttwxyz
+                defggijjklmmorttwxzy
+                defggijjklmmorttwyxz
+                defggijjklmmorttwyzx
+                defggijjklmmorttwzxy
+                defggijjklmmorttwzyx
+                defggijjklmmorttxwyz
+                defggijjklmmorttxwzy
+                defggijjklmmorttxywz
+                defggijjklmmorttxyzw
+                defggijjklmmorttxzwy
+                defggijjklmmorttxzyw
+                defggijjklmmorttywxz
+                defggijjklmmorttywzx
+                defggijjklmmorttyxwz
+                defggijjklmmorttyxzw
+                defggijjklmmorttyzwx
+                defggijjklmmorttyzxw
+                defggijjklmmorttzwxy
+                defggijjklmmorttzwyx
+
+        \end{lstlisting}
+
+        Saída de \ttt{EP2}:
+        \begin{lstlisting}
+            Biggest set of anagrams:
+            Queue (20 elements):
+                defggijjklmmorttwxyz
+                defggijjklmmorttwxzy
+                defggijjklmmorttwyxz
+                defggijjklmmorttwyzx
+                defggijjklmmorttwzxy
+                defggijjklmmorttwzyx
+                defggijjklmmorttxwyz
+                defggijjklmmorttxwzy
+                defggijjklmmorttxywz
+                defggijjklmmorttxyzw
+                defggijjklmmorttxzwy
+                defggijjklmmorttxzyw
+                defggijjklmmorttywxz
+                defggijjklmmorttywzx
+                defggijjklmmorttyxwz
+                defggijjklmmorttyxzw
+                defggijjklmmorttyzwx
+                defggijjklmmorttyzxw
+                defggijjklmmorttzwxy
+                defggijjklmmorttzwyx
+
+        \end{lstlisting}
+
 \end{document}

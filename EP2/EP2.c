@@ -85,7 +85,7 @@ int main(int argc, char const *argv[]) {
     }
 
     /* Present results */
-    printf("Biggest set of anagrams (length = %d):\n", qmax->length);
+    printf("Biggest set of anagrams:\n");
     queue_print(qmax);
 
     /* Free allocations */
