@@ -5,6 +5,9 @@
 
 #define BUFFER_SIZE 256
 
+HeapNode* huffman(Heap *h);
+void traverse(HeapNode *hn);
+bool isleaf(HeapNode *hn);
 
 int main(int argc, char const *argv[]) {
     uint8_t buffer[BUFFER_SIZE];
@@ -30,14 +33,14 @@ int main(int argc, char const *argv[]) {
         }
 
         for(i = 0; i < r; i++) {
-            printf("%x\n", buffer[i]);
+            // printf("%x\n", buffer[i]);
             count[buffer[i]] += 1;
         }
 
         if(feof(file)) break;
     }
     fclose(file);
-    
+
     h = heap_create(256);
     for(i = 0; i < 256; i++) {
         if(count[i] == 0)
@@ -47,23 +50,46 @@ int main(int argc, char const *argv[]) {
         heap_push(h, hn);
     }
 
-    while(h->size > 0) {
-        hn = heap_pop(h);
-        printf("%x %d\n", hn->value, hn->key);
-        heapnode_free(hn);
-    }
 
+    hn = huffman(h);
+    traverse(hn);
+
+    heapnode_free(hn);
     heap_free(h);
     return 0;
 }
 
-// void huffman(Heap *h) {
-//     HeapNode hn, hn1, hn2;
-//
-//     while(h->size > 1) {
-//         *hn.left = heap_pop(h);
-//         *hn.right = heap_pop(h);
-//
-//         hn.key = hn.left->key + hn.right->key;
-//     }
-// }
+void traverse(HeapNode *hn) {
+    if(!hn)
+        return;
+
+    if(isleaf(hn))
+        printf("%x %d\n", hn->value, hn->key);
+
+    traverse(hn->left);
+    traverse(hn->right);
+}
+
+bool isleaf(HeapNode *hn) {
+    if(!hn)
+        return false;
+    else
+        return !hn->left && !hn->right;
+}
+
+HeapNode* huffman(Heap *h) {
+    HeapNode *hn, *hn1, *hn2;
+
+    while(h->size > 1) {
+        hn1 = heap_pop(h);
+        hn2 = heap_pop(h);
+
+        hn = heapnode_create(hn1->key + hn2->key, 0);
+        hn->left  = hn1;
+        hn->right = hn2;
+
+        heap_push(h, hn);
+    }
+
+    return heap_pop(h);
+}

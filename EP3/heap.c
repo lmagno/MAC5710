@@ -42,7 +42,7 @@ HeapNode* heapnode_create(uint32_t key, uint8_t value) {
 void heapnode_free(HeapNode *hn) {
     if(!hn)
         return;
-        
+
     heapnode_free(hn->left);
     heapnode_free(hn->right);
     free(hn);
@@ -51,7 +51,7 @@ void heapnode_free(HeapNode *hn) {
 void heap_free(Heap *h) {
     size_t i;
 
-    for(i = 0; i < h->size; i++)
+    for(i = 1; i <= h->size; i++)
         heapnode_free(h->nodes[i]);
 
     free(h->nodes);
