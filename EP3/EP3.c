@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "heap.c"
+
 #define BUFFER_SIZE 256
 int main(int argc, char const *argv[]) {
     uint8_t buffer[BUFFER_SIZE];
     int i, r, count[256];
     FILE *file;
+    Heap *h;
+    HeapNode hn;
 
     for(i = 0; i < 256; i++)
         count[i] = 0;
@@ -28,11 +32,21 @@ int main(int argc, char const *argv[]) {
             count[buffer[i]] += 1;
         }
 
-        for(i = 0; i < 256; i++)
-            printf("%d ", count[i]);
-
-        printf("\n");
         if(feof(file)) break;
+    }
+
+    h = heap_create(256);
+    for(i = 0; i < 256; i++) {
+        if(count[i] == 0)
+            continue;
+
+        hn = (HeapNode){ .key = (uint32_t)count[i], .value = (uint8_t)i };
+        heap_push(h, hn);
+    }
+
+    while(h->size > 0) {
+        hn = heap_pop(h);
+        printf("%x %d\n", hn.value, hn.key);
     }
     return 0;
 }
