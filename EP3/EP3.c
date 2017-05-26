@@ -4,12 +4,14 @@
 #include "heap.c"
 
 #define BUFFER_SIZE 256
+
+
 int main(int argc, char const *argv[]) {
     uint8_t buffer[BUFFER_SIZE];
     int i, r, count[256];
     FILE *file;
     Heap *h;
-    HeapNode hn;
+    HeapNode *hn;
 
     for(i = 0; i < 256; i++)
         count[i] = 0;
@@ -34,19 +36,34 @@ int main(int argc, char const *argv[]) {
 
         if(feof(file)) break;
     }
-
+    fclose(file);
+    
     h = heap_create(256);
     for(i = 0; i < 256; i++) {
         if(count[i] == 0)
             continue;
 
-        hn = (HeapNode){ .key = (uint32_t)count[i], .value = (uint8_t)i };
+        hn = heapnode_create(count[i], i);
         heap_push(h, hn);
     }
 
     while(h->size > 0) {
         hn = heap_pop(h);
-        printf("%x %d\n", hn.value, hn.key);
+        printf("%x %d\n", hn->value, hn->key);
+        heapnode_free(hn);
     }
+
+    heap_free(h);
     return 0;
 }
+
+// void huffman(Heap *h) {
+//     HeapNode hn, hn1, hn2;
+//
+//     while(h->size > 1) {
+//         *hn.left = heap_pop(h);
+//         *hn.right = heap_pop(h);
+//
+//         hn.key = hn.left->key + hn.right->key;
+//     }
+// }
