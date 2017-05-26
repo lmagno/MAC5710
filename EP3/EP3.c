@@ -12,6 +12,8 @@ void get_count(const char *filename, int count[256]);
 HeapNode* huffman(Heap *h);
 void traverse(HeapNode *hn, char s[MAX], char codes[256][MAX]);
 bool isleaf(HeapNode *hn);
+void compress(char const *filename, char codes[256][MAX]);
+void flush(char *output);
 
 int main(int argc, char const *argv[]) {
     int i, count[256];
@@ -36,16 +38,78 @@ int main(int argc, char const *argv[]) {
     s[0] = '\0';
     traverse(hn, s, codes);
 
-    for(i = 0; i < 256; i++) {
-        if(count[i] == 0)
-            continue;
-        printf("%04d\t%x\t%s\n", count[i], (uint8_t)i, codes[i]);
-    }
-    fflush(stdout);
-    printf("%ld %s\n", strtol("101", NULL, 2), "101");
+    // for(i = 0; i < 256; i++) {
+    //     if(count[i] == 0)
+    //         continue;
+    //     printf("%04d\t%x\t%s\n", count[i], (uint8_t)i, codes[i]);
+    // }
+    compress(argv[1], codes);
+
+
     heapnode_free(hn);
     heap_free(h);
     return 0;
+}
+
+void compress(char const *filename, char codes[256][MAX]) {
+    int i, r, n;
+    char *s, output[128+1] = "";
+    FILE *file;
+    uint8_t buffer[BUFFER_SIZE];
+
+    file = fopen(filename, "rb");
+    if(!file) {
+        fprintf(stderr, "ERROR: Couldn't open file %s.\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    while(1) {
+        r = fread(buffer, sizeof(uint8_t), BUFFER_SIZE, file);
+        if(ferror(file)) {
+            fprintf(stderr, "ERROR: Couldn't read from file %s, fscanf returned %d.\n", filename, r);
+            exit(EXIT_FAILURE);
+        }
+
+        for(i = 0; i < r; i++) {
+            s = codes[buffer[i]];
+            printf("%x\t%s\n", (uint8_t)buffer[i], s);
+            if(strlen(output) + strlen(s) > 128) {
+                flush(output);
+            }
+
+            strcat(output, s);
+        }
+
+        if(feof(file)) break;
+    }
+    flush(output);
+    
+    n = strlen(output);
+    for(i = 0; i < 8-n; i++) strcat(output, "0");
+    for(i = 0; i < n;   i++) strcat(output, "1");
+    for(i = 0; i < 8-n; i++) strcat(output, "0");
+    flush(output);
+    printf("%s\n", output);
+    fclose(file);
+}
+
+void flush(char *output) {
+    unsigned int offset;
+    char s[9];
+
+    offset = 0;
+    while(1) {
+        strncpy(s, output + offset, 8);
+        s[9] = '\0';
+
+        if(strlen(s) < 8) {
+            strcpy(output, s);
+            return;
+        }
+
+        printf("%s %x\n", s, (unsigned int)strtol(s, NULL, 2));
+        offset += 8;
+    }
 }
 
 void traverse(HeapNode *hn, char s[MAX], char codes[256][MAX]) {
