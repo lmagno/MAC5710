@@ -6,23 +6,46 @@
 #include "heap.c"
 
 #define BUFFER_SIZE 256
-#define MAX 100
+#define MAX 1000
+typedef HeapNode HuffmanTree;
+const char *bits[16] = {
+    "0000", "0001", "0010", "0011",
+    "0100", "0101", "0110", "0111",
+    "1000", "1001", "1010", "1011",
+    "1100", "1101", "1110", "1111"
+};
 
 void get_count(const char *filename, int count[256]);
-HeapNode* huffman(Heap *h);
-void traverse(HeapNode *hn, char s[MAX], char codes[256][MAX]);
-bool isleaf(HeapNode *hn);
-void compress(char const *filename, char codes[256][MAX]);
-void flush(char *output);
+HuffmanTree* huffman(Heap *h);
+int huffman_codes(HuffmanTree *hn, char s[MAX], char codes[256][MAX]);
+bool isleaf(HuffmanTree *hn);
+void compress(char const *finname, char const *foutname);
+void flush(FILE *file, char *output);
+void huffman_serialize(char *s, HuffmanTree *hn);
+
 
 int main(int argc, char const *argv[]) {
-    int i, count[256];
-    char s[MAX], codes[256][MAX] = { "" };
+
+    compress(argv[1], argv[2]);
+    return 0;
+}
+
+void compress(char const *finname, char const *foutname) {
+    int i, r, n, length, count[256];
+    size_t size_in, size_out;
+    char *s, *he, tmp[MAX] = "",
+        buffer_out[BUFFER_SIZE+1] = "",
+        codes[256][MAX] = { "" };
+    FILE *fin, *fout;
     Heap *h;
     HeapNode *hn;
+    HuffmanTree *ht;
+    uint8_t buffer_in[BUFFER_SIZE];
 
-    get_count(argv[1], count);
+    /* Get frequency count of bytes in file */
+    get_count(finname, count);
 
+    /* Put those frequencies in a heap */
     h = heap_create(256);
     for(i = 0; i < 256; i++) {
         if(count[i] == 0)
@@ -32,112 +55,163 @@ int main(int argc, char const *argv[]) {
         heap_push(h, hn);
     }
 
+    /* Get Huffman tree */
+    ht = huffman(h);
 
-    hn = huffman(h);
+    /* Get the code of each byte and the length of the tree's serialization */
+    length = huffman_codes(ht, tmp, codes); printf("length = %d\n", length);
+    he = (char*)calloc(length+1, sizeof(char));
 
-    s[0] = '\0';
-    traverse(hn, s, codes);
-
-    // for(i = 0; i < 256; i++) {
-    //     if(count[i] == 0)
-    //         continue;
-    //     printf("%04d\t%x\t%s\n", count[i], (uint8_t)i, codes[i]);
-    // }
-    compress(argv[1], codes);
+    /* Serialize the tree so we can write it to the output */
+    huffman_serialize(he, ht); printf("Huffman = %s\n", he);
 
 
-    heapnode_free(hn);
-    heap_free(h);
-    return 0;
-}
-
-void compress(char const *filename, char codes[256][MAX]) {
-    int i, r, n;
-    char *s, output[128+1] = "";
-    FILE *file;
-    uint8_t buffer[BUFFER_SIZE];
-
-    file = fopen(filename, "rb");
-    if(!file) {
-        fprintf(stderr, "ERROR: Couldn't open file %s.\n", filename);
+    fin = fopen(finname, "rb");
+    if(!fin) {
+        fprintf(stderr, "ERROR: Couldn't open file %s.\n", finname);
         exit(EXIT_FAILURE);
     }
 
+    fout = fopen(foutname, "wb");
+    if(!fout) {
+        fprintf(stderr, "ERROR: Couldn't open file %s.\n", foutname);
+        exit(EXIT_FAILURE);
+    }
+
+    /* Flush all complete bytes of the tree's serialization
+    and keep the remaining bits in the output buffer */
+    flush(fout, he);
+    strcpy(buffer_out, he);
+    free(he);
+
+    /* Continuously read from input and write to output */
     while(1) {
-        r = fread(buffer, sizeof(uint8_t), BUFFER_SIZE, file);
-        if(ferror(file)) {
-            fprintf(stderr, "ERROR: Couldn't read from file %s, fscanf returned %d.\n", filename, r);
+        /* Read at most BUFFER_SIZE bytes from the input */
+        r = fread(buffer_in, sizeof(uint8_t), BUFFER_SIZE, fin);
+        if(ferror(fin)) {
+            fprintf(stderr, "ERROR: Couldn't read from file %s, fscanf returned %d.\n", finname, r);
             exit(EXIT_FAILURE);
         }
 
+        /* If output buffer is full, flush complete bytes to the output */
         for(i = 0; i < r; i++) {
-            s = codes[buffer[i]];
-            printf("%x\t%s\n", (uint8_t)buffer[i], s);
-            if(strlen(output) + strlen(s) > 128) {
-                flush(output);
+            s = codes[buffer_in[i]];
+            // printf("%x\t%s\n", (uint8_t)buffer[i], s);
+            if(strlen(buffer_out) + strlen(s) > BUFFER_SIZE+1) {
+                flush(fout, buffer_out);
             }
 
-            strcat(output, s);
+            strcat(buffer_out, s);
         }
 
-        if(feof(file)) break;
+        if(feof(fin)) break;
     }
-    flush(output);
-    
-    n = strlen(output);
-    for(i = 0; i < 8-n; i++) strcat(output, "0");
-    for(i = 0; i < n;   i++) strcat(output, "1");
-    for(i = 0; i < 8-n; i++) strcat(output, "0");
-    flush(output);
-    printf("%s\n", output);
-    fclose(file);
+    /* Flush complete bytes to the output */
+    flush(fout, buffer_out);
+
+    /* Padding of last bits plus a byte with a mask */
+    n = strlen(buffer_out);
+    for(i = 0; i < 8-n; i++) strcat(buffer_out, "0");
+    for(i = 0; i < n;   i++) strcat(buffer_out, "1");
+    for(i = 0; i < 8-n; i++) strcat(buffer_out, "0");
+    flush(fout, buffer_out);
+
+    if(strlen(buffer_out) > 0) {
+        fprintf(stderr, "ERROR: Wrong padding at end of file (%ld bits remaining).\n", strlen(buffer_out));
+        exit(EXIT_FAILURE);
+    }
+
+    /* Print out statistics */
+    size_in  = ftell(fin);
+    size_out = ftell(fout);
+    printf("Tamanho do arquivo original:   %ld\n", size_in);
+    printf("Tamanho do arquivo comprimido: %ld\n", size_out);
+    printf("Compressão: %.1f%%\n", 100*size_out/(double)size_in);
+
+
+    heapnode_free(ht);
+    heap_free(h);
+    fclose(fin);
+    fclose(fout);
 }
 
-void flush(char *output) {
-    unsigned int offset;
+void huffman_serialize(char *he, HuffmanTree *ht) {
+    char s[20];
+
+    if(!ht)
+        return;
+
+    if(isleaf(ht)) {
+        sprintf(s, "1%s%s", bits[ht->value >> 4], bits[ht->value & 0x0F]);
+        strcat(he, s);
+    } else {
+        strcat(he, "0");
+        huffman_serialize(he, ht->left);
+        huffman_serialize(he, ht->right);
+    }
+}
+
+void flush(FILE *file, char *output) {
+    unsigned int offset, size;
+    uint8_t *buffer;
     char s[9];
 
+    size = strlen(output)/8;
+    buffer = (uint8_t*)malloc(size*sizeof(uint8_t));
     offset = 0;
     while(1) {
-        strncpy(s, output + offset, 8);
-        s[9] = '\0';
+        strncpy(s, output + 8*offset, 8);
+        s[8] = '\0';
 
         if(strlen(s) < 8) {
+            fwrite(buffer, sizeof(uint8_t), offset, file);
+            free(buffer);
             strcpy(output, s);
             return;
         }
 
-        printf("%s %x\n", s, (unsigned int)strtol(s, NULL, 2));
-        offset += 8;
+        // printf("%s %x\n", s, (unsigned int)strtol(s, NULL, 2));
+        buffer[offset] = (uint8_t)strtol(s, NULL, 2);
+        // printf("%x\n", buffer[offset]);
+        offset += 1;
     }
+
 }
 
-void traverse(HeapNode *hn, char s[MAX], char codes[256][MAX]) {
+int huffman_codes(HuffmanTree *ht, char tmp[MAX], char codes[256][MAX]) {
+    int length;
     char sl[MAX], sr[MAX];
 
-    if(!hn)
-        return;
+    if(!ht)
+        return 0;
 
-    if(isleaf(hn))
-        strcpy(codes[hn->value], s);
+    if(isleaf(ht)) {
+        strcpy(codes[ht->value], tmp);
+        printf("%x\t%s\n", ht->value, tmp);
+        length = 9;
+    } else {
+        length = 1;
 
-    strcpy(sl, s);
-    strcat(sl, "0");
-    traverse(hn->left, sl, codes);
+        strcpy(sl, tmp);
+        strcat(sl, "0");
+        length += huffman_codes(ht->left, sl, codes);
 
-    strcpy(sr, s);
-    strcat(sr, "1");
-    traverse(hn->right, sr, codes);
+        strcpy(sr, tmp);
+        strcat(sr, "1");
+        length += huffman_codes(ht->right, sr, codes);
+    }
+
+    return length;
 }
 
-bool isleaf(HeapNode *hn) {
-    if(!hn)
+bool isleaf(HuffmanTree *ht) {
+    if(!ht)
         return false;
     else
-        return !hn->left && !hn->right;
+        return !ht->left && !ht->right;
 }
 
-HeapNode* huffman(Heap *h) {
+HuffmanTree* huffman(Heap *h) {
     HeapNode *hn, *hn1, *hn2;
 
     while(h->size > 1) {
