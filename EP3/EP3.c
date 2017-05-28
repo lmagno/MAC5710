@@ -10,8 +10,6 @@
 #define MAX 1000
 typedef HeapNode HuffmanTree;
 
-
-
 void get_count(const char *filename, int count[256]);
 HuffmanTree* huffman(Heap *h);
 int huffman_codes(HuffmanTree *hn, char s[MAX], char codes[256][MAX]);
@@ -23,6 +21,10 @@ void huffman_serialize(char *s, HuffmanTree *hn);
 HuffmanTree* huffman_deserialize(Buffer *b);
 
 int main(int argc, char const *argv[]) {
+    if(argc != 4) {
+        fprintf(stderr, "Wrong number of arguments given, check README file for instructions.\n");
+        exit(EXIT_FAILURE);
+    }
 
     switch(argv[1][0]) {
         case 'c':
@@ -51,6 +53,7 @@ void decompress(char const *fname_in, char const *fname_out) {
 
     buffer_in  = buffer_create(fname_in, 'r');
     buffer_out = buffer_create(fname_out, 'w');
+
     /* Read Huffman tree */
     ht = huffman_deserialize(buffer_in);
 
@@ -78,7 +81,6 @@ void decompress(char const *fname_in, char const *fname_out) {
         if(isleaf(hn)) {
             v = hn->value;
             buffer_write(buffer_out, v);
-            printf("%s%s %x\n", bits[v >> 4], bits[v & 0x0F], v);
             hn = ht;
         }
 
@@ -112,7 +114,6 @@ void decompress(char const *fname_in, char const *fname_out) {
         if(isleaf(hn)) {
             v = hn->value;
             buffer_write(buffer_out, v);
-            printf("%s%s %x\n", bits[v >> 4], bits[v & 0x0F], v);
             hn = ht;
         }
     }
@@ -122,7 +123,7 @@ void decompress(char const *fname_in, char const *fname_out) {
     buffer_close(buffer_out);
 }
 
-
+/* Create a Huffman tree from its serialized representation in buffer 'b' */
 HuffmanTree* huffman_deserialize(Buffer *b) {
     int i;
     char c, value[9];
@@ -132,6 +133,7 @@ HuffmanTree* huffman_deserialize(Buffer *b) {
     c = buffer_read(b);
     switch(c) {
         case '0':
+            /* If it's not a leaf, read its children */
             left  = huffman_deserialize(b);
             right = huffman_deserialize(b);
             ht = heapnode_create(left->key + right->key, 0);
@@ -140,6 +142,7 @@ HuffmanTree* huffman_deserialize(Buffer *b) {
             break;
 
         case '1':
+            /* If it's a leaf, read its value */
             for(i = 0; i < 8; i++)
                 value[i] = buffer_read(b);
 
@@ -269,7 +272,7 @@ void huffman_serialize(char *he, HuffmanTree *ht) {
         return;
 
     if(isleaf(ht)) {
-        sprintf(s, "1%s%s", bits[ht->value >> 4], bits[ht->value & 0x0F]);
+        sprintf(s, "1%s%s", nibbles[ht->value >> 4], nibbles[ht->value & 0x0F]);
         strcat(he, s);
     } else {
         strcat(he, "0");
