@@ -135,6 +135,7 @@ void compress(char const *finname, char const *foutname) {
     fclose(fout);
 }
 
+/* Create a serialization (string of bits) of a Huffman tree */
 void huffman_serialize(char *he, HuffmanTree *ht) {
     char s[20];
 
@@ -151,6 +152,8 @@ void huffman_serialize(char *he, HuffmanTree *ht) {
     }
 }
 
+/* Write all complete bytes in string "output" to the file "file",
+keeping only the remaining bits in the string */
 void flush(FILE *file, char *output) {
     unsigned int offset, size;
     uint8_t *buffer;
@@ -178,32 +181,35 @@ void flush(FILE *file, char *output) {
 
 }
 
-int huffman_codes(HuffmanTree *ht, char tmp[MAX], char codes[256][MAX]) {
+/* Store the associated code of each leaf in a Huffman tree, also returning
+the length of the tree's serialization */
+int huffman_codes(HuffmanTree *ht, char code[MAX], char codes[256][MAX]) {
     int length;
-    char sl[MAX], sr[MAX];
+    char left[MAX], right[MAX];
 
     if(!ht)
         return 0;
 
     if(isleaf(ht)) {
-        strcpy(codes[ht->value], tmp);
-        printf("%x\t%s\n", ht->value, tmp);
+        strcpy(codes[ht->value], code);
+        printf("%x\t%s\n", ht->value, code);
         length = 9;
     } else {
         length = 1;
 
-        strcpy(sl, tmp);
-        strcat(sl, "0");
-        length += huffman_codes(ht->left, sl, codes);
+        strcpy(left, code);
+        strcat(left, "0");
+        length += huffman_codes(ht->left, left, codes);
 
-        strcpy(sr, tmp);
-        strcat(sr, "1");
-        length += huffman_codes(ht->right, sr, codes);
+        strcpy(right, code);
+        strcat(right, "1");
+        length += huffman_codes(ht->right, right, codes);
     }
 
     return length;
 }
 
+/* Check if a given node in a Huffman tree is a leaf */
 bool isleaf(HuffmanTree *ht) {
     if(!ht)
         return false;
@@ -211,6 +217,7 @@ bool isleaf(HuffmanTree *ht) {
         return !ht->left && !ht->right;
 }
 
+/* Generate a Huffman tree from nodes in a heap */
 HuffmanTree* huffman(Heap *h) {
     HeapNode *hn, *hn1, *hn2;
 
@@ -228,11 +235,11 @@ HuffmanTree* huffman(Heap *h) {
     return heap_pop(h);
 }
 
+/* Get the number of occurrences of each byte in file "filename" */
 void get_count(const char *filename, int count[256]) {
     int i, r;
     FILE *file;
     uint8_t buffer[BUFFER_SIZE];
-
 
     for(i = 0; i < 256; i++)
         count[i] = 0;
@@ -251,7 +258,6 @@ void get_count(const char *filename, int count[256]) {
         }
 
         for(i = 0; i < r; i++) {
-            // printf("%x\n", buffer[i]);
             count[buffer[i]] += 1;
         }
 
