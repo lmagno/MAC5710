@@ -226,7 +226,7 @@ void compress(char const *fname_in, char const *fname_out) {
         /* If output buffer is full, flush complete bytes to the output */
         for(i = 0; i < r; i++) {
             s = codes[buffer_in[i]];
-            if(strlen(buffer_out) + strlen(s) > BUFFER_SIZE+1) {
+            if(strlen(buffer_out) + strlen(s) > BUFFER_SIZE) {
                 flush(fout, buffer_out);
             }
 
