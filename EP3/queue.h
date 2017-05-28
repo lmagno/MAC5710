@@ -22,7 +22,7 @@ struct _Queue {
 
 Queue* queue_create();
 void   queue_push(Queue *q, char c);
-char queue_pop(Queue *q);
+char   queue_pop(Queue *q);
 void   queue_free(Queue *q);
 void   queue_print(Queue *q);
 int    queue_length(Queue* q);
