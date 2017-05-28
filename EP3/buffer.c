@@ -17,15 +17,28 @@ typedef struct {
     char string[8*BUFFER_SIZE+1];
     size_t r, offset;
     FILE *file;
-    bool empty;
+    bool empty, read, write;
 } Buffer;
 
-Buffer* buffer_create(char const *filename) {
+Buffer* buffer_create(char const *filename, char mode) {
     Buffer *b;
 
     b = (Buffer*)malloc(sizeof(Buffer));
 
-    b->file = fopen(filename, "rb");
+    switch(mode) {
+        case 'r':
+            b->file = fopen(filename, "rb");
+            b->read  = true;
+            b->write = false;
+            break;
+        case 'w':
+            b->file = fopen(filename, "wb");
+            b->read  = false;
+            b->write = true;
+            break;
+        default:
+            break;
+    }
     if(!b->file) {
         fprintf(stderr, "ERROR: Couldn't open file %s.\n", filename);
         exit(EXIT_FAILURE);
@@ -51,7 +64,7 @@ void bytes2str(char *string, uint8_t *bytes, size_t r) {
     }
 }
 
-void buffer_read(Buffer *b) {
+void buffer_refresh(Buffer *b) {
     b->r = fread(b->bytes, sizeof(uint8_t), BUFFER_SIZE, b->file);
     if(ferror(b->file)) {
         fprintf(stderr, "ERROR: Couldn't read from file, fscanf returned %ld.\n", b->r);
@@ -61,8 +74,13 @@ void buffer_read(Buffer *b) {
     bytes2str(b->string, b->bytes, b->r);
 }
 
-char buffer_consume(Buffer *b) {
+char buffer_read(Buffer *b) {
     char c;
+
+    if(!b->read) {
+        fprintf(stderr, "ERROR: Buffer not in read mode, can't consume.\n");
+        exit(EXIT_FAILURE);
+    }
 
     if(b->empty) {
         fprintf(stderr, "ERROR: Buffer is empty, can't consume.\n");
@@ -70,14 +88,14 @@ char buffer_consume(Buffer *b) {
     }
 
     if(b->r == 0)
-        buffer_read(b);
+        buffer_refresh(b);
 
     c = b->string[b->offset++];
     if(b->offset == strlen(b->string)) {
         if(feof(b->file)) {
             b->empty = true;
         } else {
-            buffer_read(b);
+            buffer_refresh(b);
             b->offset = 0;
         }
     }
@@ -85,7 +103,19 @@ char buffer_consume(Buffer *b) {
     return c;
 }
 
+void buffer_write(Buffer *b, uint8_t byte) {
+    b->bytes[b->offset++] = byte;
+
+    if(b->offset == BUFFER_SIZE) {
+        fwrite(b->bytes, sizeof(uint8_t), BUFFER_SIZE, b->file);
+        b->offset = 0;
+    }
+}
+
 void buffer_close(Buffer *b) {
+    if(b->write && (b->offset > 0))
+        fwrite(b->bytes, sizeof(uint8_t), b->offset, b->file);
+
     fclose(b->file);
     free(b);
 }

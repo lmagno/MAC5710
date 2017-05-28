@@ -5,6 +5,7 @@
 #include <string.h>
 #include "heap.c"
 #include "buffer.c"
+#include "queue.h"
 
 #define MAX 1000
 typedef HeapNode HuffmanTree;
@@ -43,16 +44,82 @@ int main(int argc, char const *argv[]) {
 void decompress(char const *fname_in, char const *fname_out) {
     int i;
     HuffmanTree *ht, *hn;
-    Buffer *b;
-    char c;
+    Buffer *buffer_in, *buffer_out;
+    Queue *q;
+    char c, byte[8], mask[8];
+    uint8_t v;
 
-    b = buffer_create(fname_in);
-
+    buffer_in  = buffer_create(fname_in, 'r');
+    buffer_out = buffer_create(fname_out, 'w');
     /* Read Huffman tree */
-    ht = huffman_deserialize(b);
-    printf("\n");
+    ht = huffman_deserialize(buffer_in);
 
-    buffer_close(b);
+    q = queue_create();
+
+    /* Start queue with 16 bits so at the end we get the last two bytes */
+    for(i = 0; i < 16; i++)
+        queue_push(q, buffer_read(buffer_in));
+
+    /* Run through the Huffman tree bit-by-bit */
+    hn = ht;
+    while(!buffer_in->empty) {
+        c = queue_pop(q);
+        switch(c) {
+            case '0':
+                hn = hn->left;
+                break;
+            case '1':
+                hn = hn->right;
+                break;
+            default:
+                break;
+        }
+
+        if(isleaf(hn)) {
+            v = hn->value;
+            buffer_write(buffer_out, v);
+            printf("%s%s %x\n", bits[v >> 4], bits[v & 0x0F], v);
+            hn = ht;
+        }
+
+        queue_push(q, buffer_read(buffer_in));
+    }
+
+    /* Get last correct bits by using the mask */
+    for(i = 0; i < 8; i++) byte[i] = queue_pop(q);
+    for(i = 0; i < 8; i++) mask[i] = queue_pop(q);
+
+    i = 0;
+    while(mask[i] == '1') {
+        queue_push(q, byte[i]);
+        i++;
+    }
+
+    /* Repeat decompression for the last bits */
+    while(queue_length(q) > 0) {
+        c = queue_pop(q);
+        switch(c) {
+            case '0':
+                hn = hn->left;
+                break;
+            case '1':
+                hn = hn->right;
+                break;
+            default:
+                break;
+        }
+
+        if(isleaf(hn)) {
+            v = hn->value;
+            buffer_write(buffer_out, v);
+            printf("%s%s %x\n", bits[v >> 4], bits[v & 0x0F], v);
+            hn = ht;
+        }
+    }
+
+    queue_free(q);
+    buffer_close(buffer_in);
+    buffer_close(buffer_out);
 }
 
 
@@ -62,7 +129,7 @@ HuffmanTree* huffman_deserialize(Buffer *b) {
     HuffmanTree *ht, *left, *right;
 
     value[8] = '\0';
-    c = buffer_consume(b);
+    c = buffer_read(b);
     switch(c) {
         case '0':
             left  = huffman_deserialize(b);
@@ -74,7 +141,7 @@ HuffmanTree* huffman_deserialize(Buffer *b) {
 
         case '1':
             for(i = 0; i < 8; i++)
-                value[i] = buffer_consume(b);
+                value[i] = buffer_read(b);
 
             ht = heapnode_create(1, (uint8_t)strtol(value, NULL, 2));
             ht->left  = NULL;
