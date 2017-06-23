@@ -55,8 +55,9 @@ Sequence* sequence_read(FILE *file) {
             break;
 
         /* Increase length of string to accommodate the sequence */
-        while(strlen(s->string)+strlen(line) > s->length) {
-            s->length *= 2;
+        if(strlen(s->string)+strlen(line) > s->length) {
+            while(strlen(s->string)+strlen(line) > s->length)
+                s->length *= 2;
 
             tmp = (char*)malloc((s->length+1)*sizeof(char));
             strcpy(tmp, s->string);

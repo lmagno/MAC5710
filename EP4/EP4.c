@@ -53,15 +53,6 @@ void input(char const *filename) {
 
     file = sfopen(filename, "r");
 
-    // while(1) {
-    //     fgets(line, len, file);
-    //
-    //     if(feof(file))
-    //         break;
-    //
-    //     printf("%s\n", line);
-    // }
-
     s1 = sequence_read(file);
     s2 = sequence_read(file);
 
@@ -76,6 +67,7 @@ void input(char const *filename) {
     c1 = c2 = 'W';
     printf("blosum62[%c][%c]: %d\n", c1, c2, blosum62[c1-'A'][c2-'A']);
 }
+
 
 int main(int argc, char const *argv[]) {
 
