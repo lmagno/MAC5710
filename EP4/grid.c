@@ -253,8 +253,35 @@ void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
     l1 = strlen(s1);
     l2 = strlen(s2);
     if(i == 1 && j == 1) {
+        /* Print asterisks indicating mismatches */
+        printf("  ");
+        for(k = 1; k <= l1; k++) {
+            c1 = s1[l1-k];
+            c2 = s2[l2-k];
+
+            if(c1 != '-' && c2 != '-' && (c1 != c2))
+                printf("*");
+            else
+                printf(" ");
+        }
+        printf("\n");
+
+        /* Print first string */
         printf("  ");
         for(k = 1; k <= l1; k++) printf("%c", s1[l1-k]);
+        printf("\n");
+
+        /* Print vertical bars indicating matches */
+        printf("  ");
+        for(k = 1; k <= l1; k++) {
+            c1 = s1[l1-k];
+            c2 = s2[l2-k];
+
+            if(c1 != '-' && c2 != '-' && (c1 == c2))
+                printf("|");
+            else
+                printf(" ");
+        }
         printf("\n");
 
         printf("  ");
