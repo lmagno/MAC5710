@@ -78,6 +78,8 @@ int main(int argc, char const *argv[]) {
     grid_fill(g, match, mismatch, indel);
     grid_print(g);
     grid_printarrows(g);
+
+    grid_matches(g);
     grid_free(g);
 
     return 0;

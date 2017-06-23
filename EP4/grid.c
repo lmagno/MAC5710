@@ -3,8 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include "sequence.c"
+
 
 typedef struct {
     int value;
@@ -17,6 +19,8 @@ typedef struct {
     Sequence *s1, *s2;
     GCell ***matrix;
 } Grid;
+
+void _grid_matches(Grid *g, int i, int j, char *s1, char *s2);
 
 /* Create a cell for the grid */
 GCell* gcell_create() {
@@ -121,7 +125,7 @@ void grid_print(Grid *g) {
             printf("    ");
         else
             printf("%4c", g->matrix[i][0]->value + 'A');
-            
+
         for(j = 1; j < g->s2->len+2; j++) {
             printf("%4d", g->matrix[i][j]->value);
         }
@@ -167,6 +171,68 @@ void grid_printarrows(Grid *g) {
         printf("\n");
     }
     printf("\n");
+}
+
+
+void grid_matches(Grid *g) {
+    int l1 = g->s1->len;
+    int l2 = g->s2->len;
+    char s1[l1+l2+1], s2[l1+l2+1];
+
+    printf("Score: %d\n", g->matrix[l1+1][l2+1]->value);
+    printf("Matches:\n");
+    s1[0] = s2[0] = '\0';
+    _grid_matches(g, l1+1, l2+1, s1, s2);
+
+}
+
+void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
+    GCell *gc = g->matrix[i][j];
+    char c1 = g->matrix[i][0]->value + 'A';
+    char c2 = g->matrix[0][j]->value + 'A';
+    size_t l1 = strlen(s1);
+    size_t l2 = strlen(s2);
+    int k;
+
+    if(gc->top)  {
+        s1[l1] = c1;
+        s2[l2] = '-';
+        s1[l1+1] = '\0';
+        s2[l2+1] = '\0';
+
+        _grid_matches(g, i-1,   j, s1, s2);
+    }
+
+    if(gc->left) {
+        s1[l1] = '-';
+        s2[l2] = c2;
+        s1[l1+1] = '\0';
+        s2[l2+1] = '\0';
+
+        _grid_matches(g,   i, j-1, s1, s2);
+    }
+
+    if(gc->diag) {
+        s1[l1] = c1;
+        s2[l2] = c2;
+        s1[l1+1] = '\0';
+        s2[l2+1] = '\0';
+
+        _grid_matches(g, i-1, j-1, s1, s2);
+    }
+
+    l1 = strlen(s1);
+    l2 = strlen(s2);
+    if(i == 1 && j == 1) {
+        printf("  ");
+        for(k = 1; k <= l1; k++) printf("%c", s1[l1-k]);
+        printf("\n");
+
+        printf("  ");
+        for(k = 1; k <= l2; k++) printf("%c", s2[l2-k]);
+        printf("\n");
+        printf("\n");
+    }
 }
 
 void grid_free(Grid *g) {
