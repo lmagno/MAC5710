@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "sequence.c"
+#include "grid.c"
 
 const int blosum62[26][26] = {
     { 4, -2,  0, -2, -1, -2,  0, -2, -1, -1, -1, -1, -1, -2,  0, -1, -1, -1,  1,  0,  0,  0, -3,  0, -2, -1},
@@ -44,10 +45,7 @@ FILE* sfopen(char const *filename, char const *mode) {
 }
 
 
-void input(char const *filename) {
-    int len = 80;
-    char line[len+1];
-    char c1, c2;
+void input(char const *filename, Sequence **s1_ptr, Sequence **s2_ptr) {
     FILE *file;
     Sequence *s1, *s2;
 
@@ -56,21 +54,31 @@ void input(char const *filename) {
     s1 = sequence_read(file);
     s2 = sequence_read(file);
 
-    sequence_print(s1);
-    printf("\n\n");
-    sequence_print(s2);
-
-    sequence_free(s1);
-    sequence_free(s2);
     fclose(file);
 
-    c1 = c2 = 'W';
-    printf("blosum62[%c][%c]: %d\n", c1, c2, blosum62[c1-'A'][c2-'A']);
+    *s1_ptr = s1;
+    *s2_ptr = s2;
 }
 
 
 int main(int argc, char const *argv[]) {
+    Sequence *s1, *s2;
+    Grid *g;
+    int match, mismatch, indel;
 
-    input(argv[1]);
+    match    =  1;
+    mismatch = -1;
+    indel    = -1;
+
+    input(argv[1], &s1, &s2);
+
+    g = grid_create(s1, s2);
+    grid_print(g);
+
+    grid_fill(g, match, mismatch, indel);
+    grid_print(g);
+    grid_printarrows(g);
+    grid_free(g);
+
     return 0;
 }

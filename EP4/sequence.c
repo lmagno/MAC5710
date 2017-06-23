@@ -1,3 +1,6 @@
+#ifndef SEQUENCE_C
+#define SEQUENCE_C
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,10 +15,11 @@ bool isamino(char c) {
 
     return false;
 }
+
 typedef struct {
     char comment[81];
     char *string;
-    size_t length;
+    size_t len, max;
 } Sequence;
 
 /* Remove trailing newline */
@@ -41,7 +45,7 @@ Sequence* sequence_read(FILE *file) {
 
     strcpy(s->comment, line+1);
     s->string = (char*)malloc(129*sizeof(char));
-    s->length = 128;
+    s->max = 128;
 
     s->string[0] = '\0';
 
@@ -55,11 +59,11 @@ Sequence* sequence_read(FILE *file) {
             break;
 
         /* Increase length of string to accommodate the sequence */
-        if(strlen(s->string)+strlen(line) > s->length) {
-            while(strlen(s->string)+strlen(line) > s->length)
-                s->length *= 2;
+        if(strlen(s->string)+strlen(line) > s->max) {
+            while(strlen(s->string)+strlen(line) > s->max)
+                s->max *= 2;
 
-            tmp = (char*)malloc((s->length+1)*sizeof(char));
+            tmp = (char*)malloc((s->max+1)*sizeof(char));
             strcpy(tmp, s->string);
             free(s->string);
             s->string = tmp;
@@ -69,6 +73,7 @@ Sequence* sequence_read(FILE *file) {
 
     }
 
+    s->len = strlen(s->string);
     return s;
 }
 
@@ -85,3 +90,5 @@ void sequence_free(Sequence *s) {
     free(s->string);
     free(s);
 }
+
+#endif
