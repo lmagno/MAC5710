@@ -30,11 +30,11 @@ void remove_newline(char *s) {
 
 /* Safe fgets */
 void sfgets(char *line, size_t length, FILE* file) {
-    if(!fgets(line, length, file)) {
+    fgets(line, length, file);
+    if(ferror(file)) {
         fprintf(stderr, "ERROR: Couldn't read line from file.\n");
         exit(EXIT_FAILURE);
     }
-
 }
 
 /* Read a whole aminoacid sequence from file */

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "sequence.c"
 
+/* Similarity matrix BLOSUM62 for Needleman-Wunsch algorithm */
 const int blosum62[26][26] = {
     { 4, -2,  0, -2, -1, -2,  0, -2, -1, -1, -1, -1, -1, -2,  0, -1, -1, -1,  1,  0,  0,  0, -3,  0, -2, -1},
     {-2,  4, -3,  4,  1, -3, -1,  0, -3, -4,  0, -4, -3,  3, -1, -2,  0, -1,  0, -1, -1, -3, -4, -1, -3,  1},
@@ -36,6 +37,7 @@ const int blosum62[26][26] = {
     {-1,  1, -3,  1,  4, -3, -2,  0, -3, -3,  1, -3, -1,  0, -1, -1,  3,  0,  0, -1, -1, -2, -3, -1, -2,  4}
 };
 
+/* A single cell of the grid */
 typedef struct {
     int value;
     bool top;
@@ -43,6 +45,7 @@ typedef struct {
     bool diag;
 } GCell;
 
+/* A grid */
 typedef struct {
     Sequence *s1, *s2;
     GCell ***matrix;
@@ -51,6 +54,7 @@ typedef struct {
 } Grid;
 
 void _grid_matches(Grid *g, int i, int j, char *s1, char *s2);
+
 
 /* Create a cell for the grid */
 GCell* gcell_create() {
@@ -138,6 +142,7 @@ void grid_fill(Grid *g, int gap) {
 }
 
 
+/* Print a grid displaying the score of each cell */
 void grid_print(Grid *g) {
     int i, j;
 
@@ -160,6 +165,7 @@ void grid_print(Grid *g) {
     printf("\n");
 }
 
+/* Print a grid displaying arrows indicating biggest score paths */
 void grid_printarrows(Grid *g) {
     int i, j;
 
@@ -199,7 +205,7 @@ void grid_printarrows(Grid *g) {
     printf("\n");
 }
 
-
+/* Recursively find all matches (biggest score) of the two sequences in the grid */
 void grid_matches(Grid *g) {
     int l1 = g->s1->len;
     int l2 = g->s2->len;
@@ -221,6 +227,7 @@ void grid_matches(Grid *g) {
     free(s2);
 }
 
+/* Internal function for recursion */
 void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
     GCell *gc = g->matrix[i][j];
     char c1 = g->matrix[i][0]->value + 'A';
@@ -256,6 +263,8 @@ void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
         _grid_matches(g, i-1, j-1, s1, s2);
     }
 
+    /* If we're at the end of the recursion (first cell in the grid), */
+    /* print the current match */
     l1 = strlen(s1);
     l2 = strlen(s2);
     if(i == 1 && j == 1) {
@@ -300,11 +309,14 @@ void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
 }
 
 void grid_free(Grid *g) {
-    int i;
+    int i, j;
 
-    for(i = 0; i < g->s1->len+2; i++)
+    for(i = 0; i < g->s1->len+2; i++) {
+        for(j = 0; j < g->s2->len+2; j++) {
+            free(g->matrix[i][j]);
+        }
         free(g->matrix[i]);
-
+    }
     free(g->matrix);
 
     sequence_free(g->s1);
