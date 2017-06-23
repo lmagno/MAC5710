@@ -28,6 +28,16 @@ void remove_newline(char *s) {
         s[strlen(s)-1] = '\0';
 }
 
+/* Safe fgets */
+void sfgets(char *line, size_t length, FILE* file) {
+    if(!fgets(line, length, file)) {
+        fprintf(stderr, "ERROR: Couldn't read line from file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+}
+
+/* Read a whole aminoacid sequence from file */
 Sequence* sequence_read(FILE *file) {
     char line[81], *tmp;
     Sequence *s;
@@ -36,7 +46,7 @@ Sequence* sequence_read(FILE *file) {
 
     /* Read comment */
     while(1) {
-        fgets(line, 80, file);
+        sfgets(line, 80, file);
         remove_newline(line);
 
         if(line[0] == '>') break;
@@ -51,7 +61,7 @@ Sequence* sequence_read(FILE *file) {
 
     /* Read string */
     while(1) {
-        fgets(line, 80, file);
+        sfgets(line, 80, file);
         remove_newline(line);
 
         /* Stop if end of file or end of sequence */

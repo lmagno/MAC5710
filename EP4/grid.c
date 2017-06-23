@@ -203,7 +203,10 @@ void grid_printarrows(Grid *g) {
 void grid_matches(Grid *g) {
     int l1 = g->s1->len;
     int l2 = g->s2->len;
-    char s1[l1+l2+1], s2[l1+l2+1];
+    char *s1, *s2;
+
+    s1 = (char*)malloc((l1+l2+1)*sizeof(char));
+    s2 = (char*)malloc((l1+l2+1)*sizeof(char));
 
     g->score = g->matrix[l1+1][l2+1]->value;
     g->alignments = 0;
@@ -213,6 +216,9 @@ void grid_matches(Grid *g) {
 
     printf("Score: %d\n", g->score);
     printf("Number of alignments found: %d\n", g->alignments);
+
+    free(s1);
+    free(s2);
 }
 
 void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {

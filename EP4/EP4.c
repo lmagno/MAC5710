@@ -46,12 +46,9 @@ int main(int argc, char const *argv[]) {
     printf("  %s\n\n", s2->string);
 
     g = grid_create(s1, s2);
-    // grid_print(g);
 
     grid_fill(g, gap);
-    // grid_print(g);
-    // grid_printarrows(g);
-
+    
     grid_matches(g);
     grid_free(g);
 
