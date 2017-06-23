@@ -46,6 +46,8 @@ typedef struct {
 typedef struct {
     Sequence *s1, *s2;
     GCell ***matrix;
+    int score;
+    int alignments;
 } Grid;
 
 void _grid_matches(Grid *g, int i, int j, char *s1, char *s2);
@@ -203,11 +205,14 @@ void grid_matches(Grid *g) {
     int l2 = g->s2->len;
     char s1[l1+l2+1], s2[l1+l2+1];
 
-    printf("Score: %d\n", g->matrix[l1+1][l2+1]->value);
+    g->score = g->matrix[l1+1][l2+1]->value;
+    g->alignments = 0;
     printf("Matches:\n");
     s1[0] = s2[0] = '\0';
     _grid_matches(g, l1+1, l2+1, s1, s2);
 
+    printf("Score: %d\n", g->score);
+    printf("Number of alignments found: %d\n", g->alignments);
 }
 
 void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
@@ -256,6 +261,8 @@ void _grid_matches(Grid *g, int i, int j, char *s1, char *s2) {
         for(k = 1; k <= l2; k++) printf("%c", s2[l2-k]);
         printf("\n");
         printf("\n");
+
+        g->alignments++;
     }
 }
 

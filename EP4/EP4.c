@@ -37,12 +37,12 @@ int main(int argc, char const *argv[]) {
     Grid *g;
     int gap;
 
-    gap = -1;
+    gap = atoi(argv[1]);
 
-    input(argv[1], &s1, &s2);
+    input(argv[2], &s1, &s2);
 
     printf("Strings:\n");
-    printf("    %s\n\n", s1->string);
+    printf("  %s\n\n", s1->string);
     printf("  %s\n\n", s2->string);
 
     g = grid_create(s1, s2);
